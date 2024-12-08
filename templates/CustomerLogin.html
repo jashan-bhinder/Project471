@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Page</title>
+  <!-- Link to the CSS file -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='CustomerLogin.css') }}">
+</head>
+<body>
+<div class="login-container">
+  <div class="login-card">
+    <!-- Brand Section -->
+    <div class="logo-container">
+      <h1 class="brand-title">Rebate Roofing</h1>
+      <p class="subtitle">Customer</p>
+    </div>
+    <!-- Login Form -->
+    <form action="{{ url_for('customer_login') }}" method="post" class="login-form">
+      <div class="input-group">
+        <label for="username">Username</label>
+        <div class="input-icon">
+          <input type="text" id="username" name="username" placeholder="Enter your username" required>
+          <span class="icon">@</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <div class="input-icon">
+          <input type="password" id="password" name="password" placeholder="********" required>
+          <span class="icon">🔒</span>
+        </div>
+      </div>
+      <button type="submit" class="login-btn">Login</button>
+    </form>
+    <!-- Links Section -->
+    <div class="links">
+      <a href="#" class="forgot-password-link">Forgot Password?</a>
+      <a href="{{ url_for('customer_create') }}">Signup</a>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Structure -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <span class="close-button">&times;</span>
+    <h2>Forgot Password</h2>
+    <p>Not implemented just yet!</p>
+  </div>
+</div>
+
+<!-- Link to the JavaScript file -->
+<script src="CustomerLogin.js"></script>
+</body>
+</html>
+

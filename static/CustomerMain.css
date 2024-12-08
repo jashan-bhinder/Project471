@@ -1,0 +1,93 @@
+/* General Styles */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f7f9fc;
+    color: #333;
+    line-height: 1.6;
+}
+
+.dashboard-container {
+    max-width: 800px;
+    margin: 20px auto;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.dashboard-header h1 {
+    color: #4e5ef7;
+    font-size: 24px;
+    margin: 0;
+}
+
+.dashboard-header p {
+    font-size: 14px;
+    color: #777;
+}
+
+/* Customer Table Styles */
+.customer-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.customer-table th, .customer-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.customer-table th {
+    background-color: #4e5ef7;
+    color: #ffffff;
+}
+
+.customer-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Actions Section */
+.actions {
+    text-align: center;
+}
+
+.action-btn {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px 20px;
+    color: white;
+    background-color: #4e5ef7;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.action-btn:hover {
+    background-color: #3d4bdb;
+}
+
+.action-btn.logout {
+    background-color: #e74c3c;
+}
+
+.action-btn.logout:hover {
+    background-color: #c0392b;
+}
+
+/* Footer */
+.dashboard-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #888;
+}

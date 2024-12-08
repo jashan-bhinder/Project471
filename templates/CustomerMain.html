@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Customer Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='CustomerMain.css') }}">
+</head>
+<body>
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <h1>Welcome, {{ customer['name'] }}!</h1>
+        <p>Your personalized dashboard</p>
+    </header>
+
+    <!-- Customer Details Section -->
+    <section class="customer-details">
+        <h2>Customer Details</h2>
+        <table class="customer-table">
+            <thead>
+            <tr>
+                <th>Property</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Customer ID</td>
+                <td>{{ customer['customer_id'] }}</td>
+            </tr>
+            <tr>
+                <td>Username</td>
+                <td>{{ customer['username'] }}</td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td>{{ customer['name'] }}</td>
+            </tr>
+            <tr>
+                <td>Address</td>
+                <td>{{ customer['address'] }}</td>
+            </tr>
+            <tr>
+                <td>Phone Number</td>
+                <td>{{ customer['phone_number'] }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Actions Section -->
+    <section class="actions">
+        <h2>Manage Your Account</h2>
+        <a href="/edit" class="action-btn">Edit Profile</a>
+        <a href="/logout" class="action-btn logout">Logout</a>
+    </section>
+</div>
+
+<!-- Optional Footer -->
+<footer class="dashboard-footer">
+    <p>&copy; 2024 Rebate Roofing. All Rights Reserved.</p>
+</footer>
+</body>
+</html>
+
+
+

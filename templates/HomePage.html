@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rebate Roofing</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='HomePage.css') }}">
+</head>
+<body>
+<header class="TopBar">
+    <nav class="navbar">
+        <div class="logo">Rebate Roofing</div>
+        <ul class="nav-links">
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+        <div>
+            <!-- Customer Login button -->
+            <a href="/customer_login" class="LoginButton">Customer Login</a>
+            <!-- Employee Login button -->
+            <button class="LoginButton" id="employee-login">Employee Login</button>
+        </div>
+    </nav>
+</header>
+
+<!-- Hero Section -->
+<section class="imagebackg">
+    <div class="hero-image">
+        <img class="img" src="https://media.istockphoto.com/id/2001793134/photo/handyman-using-nail-gun-to-install-shingle-to-repair-roof.jpg?s=1024x1024&w=is&k=20&c=GpkyzhNSzfAobs_jVnN0AfEBfQLpW-ZzitHjXJKx5to=" alt="Roof Repair">
+    </div>
+    <div class="hero-image">
+        <img class="img" src="https://media.istockphoto.com/id/2149521043/photo/bituminous-shingle-tile-against-the-sky.jpg?s=612x612&w=is&k=20&c=XrmfyLzBwf3qbHIN0HtIr2MyauH9z02e9iCGszRPHXQ=" alt="Roofing Material">
+    </div>
+</section>
+
+<!-- Offer Section -->
+<section class="offer">
+    <div class="offer-text">
+        <h1>What We Offer</h1>
+        <p>We take pride in being certified experts committed to saving you time and money. Our approach ensures the most cost-effective solutions without compromising quality. We value responsibility and discretion, requiring no tools on your end.</p>
+    </div>
+</section>
+
+<script>
+    // JavaScript to handle navigation
+    document.getElementById('customer-login').addEventListener('click', () => {
+        window.location.href = '/customer-login'; // Flask route for Customer Login
+    });
+
+    document.getElementById('employee-login').addEventListener('click', () => {
+        window.location.href = '/employee-login'; // Flask route for Employee Login
+    });
+</script>
+</body>
+</html>
+
