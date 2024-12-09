@@ -8,61 +8,240 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='CustomerMain.css') }}">
 </head>
 <body>
-<div class="dashboard-container">
-    <header class="dashboard-header">
-        <h1>Welcome, {{ customer['name'] }}!</h1>
-        <p>Your personalized dashboard</p>
+<div class="wrapper">
+    <!-- Top Bar -->
+    <header class="topbar">
+        <a href="HomePage.html" class="home-link">Home</a>
+        <h1>Customer Dashboard</h1>
     </header>
 
-    <!-- Customer Details Section -->
-    <section class="customer-details">
-        <h2>Customer Details</h2>
-        <table class="customer-table">
-            <thead>
-            <tr>
-                <th>Property</th>
-                <th>Value</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>Customer ID</td>
-                <td>{{ customer['customer_id'] }}</td>
-            </tr>
-            <tr>
-                <td>Username</td>
-                <td>{{ customer['username'] }}</td>
-            </tr>
-            <tr>
-                <td>Name</td>
-                <td>{{ customer['name'] }}</td>
-            </tr>
-            <tr>
-                <td>Address</td>
-                <td>{{ customer['address'] }}</td>
-            </tr>
-            <tr>
-                <td>Phone Number</td>
-                <td>{{ customer['phone_number'] }}</td>
-            </tr>
-            </tbody>
-        </table>
-    </section>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <ul>
+            <li><a href="#" class="nav-link active" data-section="profile">Profile</a></li>
+            <li><a href="#" class="nav-link" data-section="estimates">Estimates</a></li>
+            <li><a href="#" class="nav-link active" data-section="project-dashboard">Projects</a></li>
+            <li><a href="#" class="nav-link" data-section="logout">Logout</a></li>
+        </ul>
+    </nav>
 
-    <!-- Actions Section -->
-    <section class="actions">
-        <h2>Manage Your Account</h2>
-        <a href="/edit" class="action-btn">Edit Profile</a>
-        <a href="/logout" class="action-btn logout">Logout</a>
-    </section>
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Profile Section -->
+        <section id="profile" class="dashboard-section">
+            <h2 class="center-text">Welcome to your profile, {{ customer['NAME'] }}</h2>
+            <table class="profile-table">
+                <tr>
+                    <td><strong>Customer ID</strong></td>
+                    <td>{{ customer['CUSTOMER_ID'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Username</strong></td>
+                    <td>{{ customer['USERNAME'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Password</strong></td>
+                    <td>{{ customer['MASKED_PASSWORD'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Address</strong></td>
+                    <td>{{ customer['ADDRESS'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Phone Number</strong></td>
+                    <td>{{ customer['PHONE_NUMBER'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Name</strong></td>
+                    <td>{{ customer['NAME'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Email</strong></td>
+                    <td>{{ customer['EMAIL'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Date Joined</strong></td>
+                    <td>{{ customer['DATE_JOINED'] if 'DATE_JOINED' in customer.keys() else 'N/A' }}</td>
+                </tr>
+            </table>
+            <!-- Button to navigate to Profile Settings -->
+            <div class="center-content">
+                <button class="settings-btn" onclick="showProfileSettings()">Change Profile Settings</button>
+            </div>
+        </section>
+
+        <!-- Profile Settings Section (Initially Hidden) -->
+        <section id="profile-settings" class="dashboard-section hidden">
+            <h2 class="center-text">Change Your Profile Settings</h2>
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <ul>
+                    {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% endwith %}
+            </div>
+            <form class="settings-form" action="{{ url_for('update_customer') }}" method="POST">
+                <input type="hidden" name="customer_id" value="{{ customer['CUSTOMER_ID'] }}">
+
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" value="{{ customer['NAME'] }}" placeholder="Enter your name">
+
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" value="{{ customer['USERNAME'] }}" placeholder="Enter new username">
+
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" value="{{ customer['PASSWORD'] }}" placeholder="Enter new password">
+
+                <label for="address">Address</label>
+                <input type="text" id="address" name="address" value="{{ customer['ADDRESS'] }}" placeholder="Enter new address">
+
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" name="phone" value="{{ customer['PHONE_NUMBER'] }}" placeholder="Enter new phone number">
+
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ customer['EMAIL'] }}" placeholder="Enter new email">
+
+                <button type="submit" class="settings-btn">Save Changes</button>
+            </form>
+        </section>
+
+
+        <section id="estimates" class="dashboard-section hidden">
+            <h2 class="center-text">Your Estimates</h2>
+
+            <!-- Always visible Pending Estimates -->
+            <div id="always-visible-pending">
+                <h3>Pending Estimates</h3>
+                <ul id="pending-list"></ul> <!-- Pending estimates will always be shown here -->
+            </div>
+
+            <div id="all-estimates" class="estimate-content hidden">
+                <h3>All Estimates</h3>
+                <ul id="all-list"></ul> <!-- All estimates will be dynamically added here -->
+            </div>
+
+            <div id="recent-estimate" class="estimate-content hidden">
+                <h3>Recently Accepted Estimate</h3>
+                <p id="recent-estimate-info"></p>
+            </div>
+
+
+            <!-- Tabs for other estimates -->
+            <div class="estimate-tabs">
+                <button class="tab-btn active" onclick="showEstimateTab(event, 'recent-estimate')">Recently Accepted Estimate</button>
+                <button class="tab-btn" onclick="showEstimateTab(event, 'all-estimates')">All Estimates</button>
+                <button class="tab-btn" onclick="showEstimateTab(event, 'request-estimate')">Request Estimate</button>
+                <button class="tab-btn" onclick="showEstimateTab(event, 'search')">Search Estimate</button>
+            </div>
+
+            <!-- Tabbed Content -->
+            <div id="recent-estimate" class="estimate-content hidden">
+                <h3>Recently Accepted Estimate</h3>
+                <p id="recent-estimate-info"></p>
+                <a id="recent-estimate-download" href="#" download>Download Estimate</a>
+            </div>
+
+            <div id="all-estimates" class="estimate-content hidden">
+                <h3>All Estimates</h3>
+                <ul id="all-list"></ul>
+            </div>
+
+            <div id="request-estimate" class="estimate-content hidden">
+                <h3>Request an Estimate</h3>
+                <form class="request-form" action="{{ url_for('request_estimate') }}" method="POST">
+                    <input type="hidden" name="customer_id" value="{{ customer['CUSTOMER_ID'] }}">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" name="address" placeholder="Enter Address" required>
+                    <button class="settings-btn" type="submit">Submit</button>
+                </form>
+            </div>
+            <!-- Search Estimate Section -->
+            <div id="search" class="estimate-content hidden">
+                <h3>Search Estimate</h3>
+                <form class="search-form">
+                    <input type="hidden" name="customer_id" value="{{ customer['CUSTOMER_ID'] }}">
+                    <label for="estimate-number">Estimate Number</label>
+                    <input type="text" id="estimate-number" name="estimate_number" placeholder="Enter Estimate Number" required>
+                    <button class="settings-btn" type="button" onclick="handleSearch()">Search</button>
+                </form>
+            </div>
+
+            <!-- Modal for Search Results -->
+            <div id="search-modal" class="modal hidden">
+                <div class="modal-content">
+                    <span class="close-btn" onclick="closeModal()">&times;</span>
+                    <h4>Estimate Details</h4>
+                    <div id="modal-content-container">
+                        <!-- Search results will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="project-dashboard" class="dashboard-section hidden">
+            <h2 class="center-text">Your Projects</h2>
+
+            <!-- All Projects List -->
+            <div id="all-projects-section">
+                <h3>All Projects</h3>
+                <ul id="all-projects-list"></ul>
+            </div>
+
+            <!-- Search Project -->
+            <div id="search-project-section">
+                <h3>Search Project</h3>
+                <form id="search-project-form">
+                    <input type="hidden" name="customer_id" value="{{ customer['CUSTOMER_ID'] }}">
+                    <label for="project-num">Project Number</label>
+                    <input type="text" id="project-num" name="project_num" placeholder="Enter Project Number" required>
+                    <button type="button" onclick="handleProjectSearch()">Search</button>
+                </form>
+
+                <!-- Search Result -->
+                <div id="search-result" class="hidden">
+                    <h4>Project Details</h4>
+                    <table class="profile-table">
+                        <tr><td><strong>Project Number</strong></td><td id="result-project-num"></td></tr>
+                        <tr><td><strong>Address</strong></td><td id="result-address"></td></tr>
+                        <tr><td><strong>Start Date</strong></td><td id="result-start-date"></td></tr>
+                        <tr><td><strong>Duration</strong></td><td id="result-duration"></td></tr>
+                        <tr><td><strong>Contract Number</strong></td><td id="result-contract-num"></td></tr>
+                        <tr><td><strong>Contract PDF</strong></td><td id="result-contract-pdf"></td></tr>
+                        <tr><td><strong>Contract Date</strong></td><td id="result-contract-date"></td></tr>
+                        <tr><td><strong>Certificate Number</strong></td><td id="result-certificate-num"></td></tr>
+                        <tr><td><strong>Certificate PDF</strong></td><td id="result-certificate-pdf"></td></tr>
+                        <tr><td><strong>Certificate Date</strong></td><td id="result-certificate-date"></td></tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+
+    </div>
 </div>
-
-<!-- Optional Footer -->
-<footer class="dashboard-footer">
-    <p>&copy; 2024 Rebate Roofing. All Rights Reserved.</p>
-</footer>
+<script>
+    // Auto-hide flash messages after 5 seconds
+    document.addEventListener('DOMContentLoaded', function () {
+        const flashMessages = document.querySelector('.flash-messages');
+        if (flashMessages) {
+            setTimeout(() => {
+                flashMessages.style.display = 'none';
+            }, 5000); // Adjust time as needed (5000ms = 5 seconds)
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        const showSettings = {{ 'true' if show_settings else 'false' }};
+        if (showSettings) {
+            document.getElementById('profile-settings').classList.remove('hidden');
+            document.getElementById('profile').classList.add('hidden');
+        }
+    });
+</script>
+<script src="{{ url_for('static', filename='CustomerMain.js') }}"></script>
 </body>
 </html>
-
-
-
