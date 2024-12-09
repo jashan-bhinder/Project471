@@ -1,0 +1,1 @@
+This is the final project for the class CPSC 471 at the University of Calgary (ucalgary).The semester is currently Fall of 2024 and the motive of the final project is to build a website with a working database
