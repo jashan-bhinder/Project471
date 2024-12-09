@@ -5,14 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Registration</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='CustomerCreate.css') }}">
-
 </head>
 <body>
 <div class="registration-container">
     <div class="registration-card">
         <h1 class="form-title">Registration</h1>
+        <!-- Error Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="error-messages">
+            {% for category, message in messages %}
+            <p class="error {{ category }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
         <form action="{{ url_for('customer_create') }}" method="POST" class="registration-form">
-        <!-- Personal Details -->
+            <!-- Personal Details -->
             <fieldset>
                 <legend>Personal Details</legend>
                 <div class="form-group">
@@ -35,6 +44,10 @@
                     <label for="phone">Phone Number</label>
                     <input type="text" id="phone" name="phone" placeholder="Enter your phone number" required>
                 </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                </div>
             </fieldset>
             <!-- Submit Button -->
             <button type="submit" class="submit-btn">Create Account</button>
@@ -42,7 +55,6 @@
     </div>
 </div>
 
-<script src="scripts.js"></script>
+<script src="{{ url_for('static', filename='CustomerCreate.js') }}"></script>
 </body>
 </html>
-

@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import sqlite3
+import uuid  # Import for generating unique IDs
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Needed for flashing messages
@@ -59,14 +60,11 @@ def customer_main(customer_id):
             'address': customer[3],
             'phone_number': customer[4],
             'name': customer[5],
+            'email': customer[6],  # Include the email in the customer dictionary
         }
         return render_template('CustomerMain.html', customer=customer_dict)
     else:
         return "Customer not found", 404
-
-
-# Customer registration page
-import uuid  # Import for generating unique IDs
 
 @app.route('/customer_create', methods=['GET', 'POST'])
 def customer_create():
@@ -76,23 +74,28 @@ def customer_create():
         name = request.form['name']
         address = request.form['address']
         phone = request.form['phone']
+        email = request.form['email']
 
         # Generate a unique CUSTOMER_ID
         customer_id = f"C{str(uuid.uuid4().int)[:8]}"  # Shorten UUID to 8 digits
 
-        # Insert new customer into the database
         conn = get_db_connection()
         try:
             conn.execute(
-                'INSERT INTO CUSTOMER (CUSTOMER_ID, USERNAME, PASSWORD, ADDRESS, PHONE_NUMBER, NAME) '
-                'VALUES (?, ?, ?, ?, ?, ?)',
-                (customer_id, username, password, address, phone, name)
+                'INSERT INTO CUSTOMER (CUSTOMER_ID, USERNAME, PASSWORD, ADDRESS, PHONE_NUMBER, NAME, EMAIL) '
+                'VALUES (?, ?, ?, ?, ?, ?, ?)',
+                (customer_id, username, password, address, phone, name, email)
             )
             conn.commit()
             flash('Account created successfully. Please log in.', 'success')
             return redirect(url_for('customer_login'))
-        except sqlite3.IntegrityError:
-            flash('Username already exists.', 'error')
+        except sqlite3.IntegrityError as e:
+            if "USERNAME" in str(e):
+                flash('Username is already taken.', 'error')
+            elif "EMAIL" in str(e):
+                flash('Email is already taken.', 'error')
+            else:
+                flash('An unexpected error occurred. Please try again.', 'error')
             return redirect(url_for('customer_create'))
         finally:
             conn.close()
@@ -100,7 +103,7 @@ def customer_create():
     return render_template('CustomerCreate.html')
 
 
+
 # Run the app
 if __name__ == '__main__':
     app.run(debug=True)
-

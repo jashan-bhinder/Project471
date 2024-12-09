@@ -85,3 +85,18 @@ legend {
 .submit-btn:hover {
     background-color: #3d4bdb; /* Darker purple hover effect */
 }
+.error-messages {
+    margin-bottom: 20px;
+    background-color: #ffe6e6;
+    border: 1px solid #ff4d4d;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.error {
+    color: #ff4d4d;
+    font-weight: bold;
+    font-size: 14px;
+    margin: 5px 0;
+}
+

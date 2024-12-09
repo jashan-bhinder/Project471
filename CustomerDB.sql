@@ -5,6 +5,8 @@ CREATE TABLE CUSTOMER (
                           ADDRESS VARCHAR(100) NOT NULL,
                           PHONE_NUMBER INT(10) NOT NULL,
                           NAME VARCHAR(30) NOT NULL,
+                          EMAIL VARCHAR(50) NOT NULL,
                           PRIMARY KEY (CUSTOMER_ID),
-                          UNIQUE (USERNAME)
+                          UNIQUE (USERNAME),
+                          UNIQUE (EMAIL)
 );
