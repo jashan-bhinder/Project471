@@ -341,6 +341,29 @@ function handleProjectSearch() {
         });
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const deleteAccountBtn = document.getElementById('delete-account-btn');
+    const deleteModal = document.getElementById('delete-account-modal');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+
+    // Show the modal when the delete button is clicked
+    deleteAccountBtn.addEventListener('click', () => {
+        deleteModal.classList.remove('customer_css_hidden');
+    });
+
+    // Handle account deletion
+    confirmDeleteBtn.addEventListener('click', () => {
+        const deleteForm = document.getElementById('delete-account-form');
+        deleteForm.submit(); // Submit the form to trigger the `cust_delete_customer` route
+    });
+
+    // Close the modal when the cancel button is clicked
+    cancelDeleteBtn.addEventListener('click', () => {
+        deleteModal.classList.add('customer_css_hidden');
+    });
+});
+
 
 
 

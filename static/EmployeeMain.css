@@ -438,83 +438,469 @@ body {
     color: black;
     text-decoration: none;
 }
-.customer_css_delete-button {
-    background-color: red;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.customer_css_modal {
-    display: none;
-    position: fixed;
-    z-index: 10;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-.customer_css_modal.customer_css_hidden {
-    display: none;
-}
-
-.customer_css_modal-content {
-    background-color: white;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 30%;
-    border-radius: 5px;
-}
-
-.customer_css_modal-buttons {
+/* Project Tabs */
+.project-tabs {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    margin: 20px 0;
+    gap: 10px;
 }
 
-.customer_css_confirm-button,
-.customer_css_cancel-button {
-    padding: 10px 15px;
+.tab-btn {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.tab-btn.active {
+    background-color: #2980b9;
+}
+
+.tab-btn:hover {
+    background-color: #1f5d84;
+}
+
+/* Tab Content */
+.project-content {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.hidden {
+    display: none;
+}
+.hidden {
+    display: none;
+}
+
+.employee_center-content {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.employee_settings-btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 
-.customer_css_confirm-button {
-    background-color: red;
+.employee_settings-btn:hover {
+    background-color: #0056b3;
+}
+
+.employee_project-content {
+    margin-top: 20px;
+}
+
+
+/* General Button Styling */
+.employee_project-search-btn,
+.employee-view-projects-button,
+.employee-view-all-projects-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
     color: white;
+    background-color: #007bff; /* Blue button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px;
+    transition: background-color 0.3s ease;
 }
 
-.customer_css_cancel-button {
-    background-color: gray;
-    color: white;
+.employee_project-search-btn:hover,
+.employee-view-projects-button:hover,
+.employee-view-all-projects-button:hover {
+    background-color: #0056b3;
 }
 
-.customer_css_hidden {
-    display: none;
+.employee-view-projects-button:active,
+.employee-view-all-projects-button:active {
+    background-color: #003f7f; /* Even darker blue on click */
 }
 
-.customer_css_modal {
-    display: flex; /* Ensures the modal is displayed */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+/* Projects Section */
+#employee_all-projects,
+#employee_assigned-projects {
+    margin: 20px;
+    padding: 20px;
+    background-color: #f9f9f9; /* Light gray background for project sections */
+    border: 1px solid #ddd; /* Subtle border */
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Slight shadow */
+}
+
+#employee_all-projects h3,
+#employee_assigned-projects h3 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+#employee_all-projects ul,
+#employee_assigned-projects ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#employee_all-projects ul li,
+#employee_assigned-projects ul li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 16px;
+    color: #555;
+}
+
+#employee_all-projects ul li:last-child,
+#employee_assigned-projects ul li:last-child {
+    border-bottom: none; /* Remove border from last item */
+}
+
+/* Button Alignment */
+.employee-buttons-container {
+    display: flex;
+    gap: 10px; /* Adds space between buttons */
+    justify-content: center; /* Centers the buttons */
+    margin-top: 20px;
+}
+
+.modal {
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
 }
 
-.customer_css_modal-content {
+.modal-content {
     background: white;
     padding: 20px;
     border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.hidden {
+    display: none;
+}
+
+.employee_project-search-btn,
+.employee_modal-search-btn,
+.employee_modal-close-btn {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.employee_modal-close-btn {
+    background-color: #dc3545;
+}
+
+
+@media (max-width: 768px) {
+    .profile-table td {
+        display: block;
+        text-align: left;
+    }
+
+    #employee_project-details {
+        padding: 10px;
+    }
+
+    #result-orders-list li {
+        padding: 8px;
+    }
+}
+
+
+
+
+
+
+.employee_order-status {
+    font-size: 0.9rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.employee_order-status.completed {
+    background-color: #4caf50;
+    color: #fff;
+}
+
+.employee_order-status.incomplete {
+    background-color: #f44336;
+    color: #fff;
+}
+
+
+
+.employee_order-title {
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    color: #333;
     text-align: center;
 }
+
+.employee_order-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 600px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.employee_order-list li {
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+    font-size: 1rem;
+    color: #555;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.employee_order-list li:last-child {
+    border-bottom: none;
+}
+
+.employee_order-list li span {
+    font-weight: bold;
+    color: #333;
+}
+
+.employee_order-confirm-btn {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+}
+
+.employee_order-confirm-btn:hover {
+    background-color: #0056b3;
+}
+
+
+#confirm-order-form-container {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#confirm-order-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+#confirm-order-num-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.employee_order-confirm-btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-block;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+}
+
+.employee_order-confirm-btn:hover {
+    background-color: #0056b3;
+}
+.employee_css_modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.employee_css_modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.employee_css_hidden {
+    display: none;
+}
+
+.employee_css_modal-buttons button {
+    margin: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.employee_css_modal-confirm-btn {
+    background-color: #d9534f;
+    color: white;
+}
+
+.employee_css_modal-cancel-btn {
+    background-color: #5bc0de;
+    color: white;
+}
+.settings-btn.delete-account-btn {
+    background-color: #d9534f; /* Red for delete action */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.settings-btn.delete-account-btn:hover {
+    background-color: #c9302c;
+}
+/* Delete Button */
+.delete-account-btn {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-account-btn:hover {
+    background-color: #c9302c;
+}
+
+/* Modal Styles */
+.employee_css_modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.employee_css_modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.employee_css_modal-buttons button {
+    margin: 10px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+}
+
+.employee_css_confirm-button {
+    background-color: #d9534f;
+    color: white;
+}
+
+.employee_css_confirm-button:hover {
+    background-color: #c9302c;
+}
+
+.employee_css_cancel-button {
+    background-color: #6c757d;
+    color: white;
+}
+
+.employee_css_cancel-button:hover {
+    background-color: #5a6268;
+}
+
+/* Hidden Class */
+.employee_css_hidden {
+    display: none;
+}
+/* Style for the Delete Account button */
+.employee_css_delete-button {
+    background-color: #e74c3c; /* Red background for delete */
+    color: white; /* White text color */
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+/* Hover effect for Delete Account button */
+.employee_css_delete-button:hover {
+    background-color: #c0392b; /* Darker red for hover */
+}
+
+/* Optional focus styling for accessibility */
+.employee_css_delete-button:focus {
+    outline: 2px solid #c0392b; /* Focus outline */
+    outline-offset: 2px;
+}
+
+
+
+
+
 

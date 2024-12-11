@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Employee Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='EmployeeMain.css') }}">
+</head>
+<body>
+<div class="wrapper">
+    <header class="topbar">
+        <a href='/' class="home-link">Home</a>
+        <h1>Employee Dashboard</h1>
+    </header>
+
+    <nav class="sidebar">
+        <ul>
+            <li><a href="#" class="nav-link active" data-section="profile">Profile</a></li>
+            <li><a href="#" class="nav-link" data-section="project-dashboard">Projects</a></li>
+            <li><a href="{{ url_for('home') }}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <!-- Profile Section -->
+        <section id="profile" class="dashboard-section">
+            <h2 class="center-text">Welcome to your profile, {{ employee['FNAME'] }}</h2>
+            <table class="profile-table">
+                <tr>
+                    <td><strong>Employee ID</strong></td>
+                    <td>{{ employee['EMPLOYEE_ID'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>First Name</strong></td>
+                    <td>{{ employee['FNAME'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Last Name</strong></td>
+                    <td>{{ employee['LNAME'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Username</strong></td>
+                    <td>{{ employee['USERNAME'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Password</strong></td>
+                    <td>{{ employee['MASKED_PASSWORD'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Phone Number</strong></td>
+                    <td>{{ employee['PHONE_NUMBER'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Email</strong></td>
+                    <td>{{ employee['EMAIL'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Start Date</strong></td>
+                    <td>{{ employee['START_DATE'] }}</td>
+                </tr>
+            </table>
+            <div class="center-content">
+                <button class="settings-btn" onclick="showProfileSettings()">Change Profile Settings</button>
+                <button id="delete-account-btn" class="employee_css_delete-button">Delete Account</button>
+            </div>
+        </section>
+
+        <!-- Profile Settings Section -->
+        <section id="profile-settings" class="dashboard-section hidden">
+            <h2 class="center-text">Change Your Profile Settings</h2>
+            <form class="settings-form" action="{{ url_for('update_employee') }}" method="POST">
+                <input type="hidden" name="employee_id" value="{{ employee['EMPLOYEE_ID'] }}">
+
+                <label for="fname">First Name</label>
+                <input type="text" id="fname" name="fname" value="{{ employee['FNAME'] }}">
+
+                <label for="lname">Last Name</label>
+                <input type="text" id="lname" name="lname" value="{{ employee['LNAME'] }}">
+
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" value="{{ employee['USERNAME'] }}">
+
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" value="{{ employee['PASSWORD'] }}">
+
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" name="phone" value="{{ employee['PHONE_NUMBER'] }}">
+
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ employee['EMAIL'] }}">
+
+                <p><strong>Start Date:</strong> {{ employee['START_DATE'] }}</p>
+
+                <button type="submit" class="settings-btn">Save Changes</button>
+            </form>
+        </section>
+
+        <!-- Delete Account Modal -->
+        <div id="delete-account-modal" class="employee_css_modal employee_css_hidden">
+            <div class="employee_css_modal-content">
+                <h3>Confirm Account Deletion</h3>
+                <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+                <div class="employee_css_modal-buttons">
+                    <button type="button" id="confirm-delete-btn" class="employee_css_confirm-button">Yes, Delete</button>
+                    <button type="button" id="cancel-delete-btn" class="employee_css_cancel-button">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Section -->
+        <section id="project-dashboard" class="dashboard-section hidden">
+            <h2 class="center-text">Assigned Employee Projects</h2>
+
+            <!-- Button Container -->
+            <div class="employee-buttons-container">
+                <button id="employee_view-assigned-projects-button" class="employee-view-projects-button">
+                    View Assigned Projects
+                </button>
+                <button id="employee_view-all-projects-button" class="employee-view-all-projects-button">
+                    View All Projects
+                </button>
+                <button id="employee_search-project-button" class="employee_project-search-btn">
+                    Search Project
+                </button>
+            </div>
+
+            <!-- Assigned Projects Section -->
+            <div id="employee_assigned-projects" class="hidden">
+                <h3>Assigned Projects</h3>
+                <ul id="employee_assigned-projects-list"></ul>
+            </div>
+
+            <!-- All Projects Section -->
+            <div id="employee_all-projects" class="hidden">
+                <h3>All Projects</h3>
+                <ul id="employee_all-projects-list"></ul>
+            </div>
+
+            <!-- Search Modal -->
+            <div id="project-search-modal" class="hidden modal">
+                <div class="modal-content">
+                    <h3>Search for a Project</h3>
+                    <form id="project-search-form">
+                        <label for="project-num-input">Enter Project Number:</label>
+                        <input type="number" id="project-num-input" name="project_num" required>
+                        <div class="modal-buttons">
+                            <button type="button" id="search-project-button" class="employee_modal-search-btn">Search</button>
+                            <button type="button" id="close-modal" class="employee_modal-close-btn">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Search Result Section -->
+            <div id="employee_project-details" class="hidden">
+                <h3>Project Details</h3>
+                <table class="profile-table">
+                    <tr><td><strong>Project Number:</strong></td><td id="result-project-num"></td></tr>
+                    <tr><td><strong>Address:</strong></td><td id="result-project-address"></td></tr>
+                    <tr><td><strong>Start Date:</strong></td><td id="result-project-start-date"></td></tr>
+                    <tr><td><strong>Duration:</strong></td><td id="result-project-duration"></td></tr>
+                </table>
+
+                <h4 class="employee_order-title">Order Details</h4>
+                <ul id="result-orders-list" class="employee_order-list"></ul>
+
+                <div id="confirm-order-form-container" class="hidden">
+                    <h5>Confirm an Order</h5>
+                    <form id="confirm-order-form">
+                        <label for="confirm-order-num-input">Enter Order Number:</label>
+                        <input type="number" id="confirm-order-num-input" name="order_num" required>
+                        <button type="submit" class="employee_order-confirm-btn">Confirm Order</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='EmployeeMain.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const deleteAccountBtn = document.getElementById('delete-account-btn');
+        const deleteModal = document.getElementById('delete-account-modal');
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+
+        deleteAccountBtn.addEventListener('click', () => {
+            deleteModal.classList.remove('employee_css_hidden');
+        });
+
+        confirmDeleteBtn.addEventListener('click', () => {
+            const employeeId = "{{ employee['EMPLOYEE_ID'] }}";
+
+            fetch(`/api/employees/delete/${employeeId}`, {
+                method: 'DELETE',
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Account successfully deleted.');
+                        window.location.href = '/';
+                    } else {
+                        alert('Failed to delete account. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting your account.');
+                });
+        });
+
+        cancelDeleteBtn.addEventListener('click', () => {
+            deleteModal.classList.add('employee_css_hidden');
+        });
+    });
+</script>
+</body>
+</html>

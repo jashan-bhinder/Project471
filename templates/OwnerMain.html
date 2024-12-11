@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='OwnerMain.css') }}">
+    <title>Owner Main Page</title>
+</head>
+<body>
+<div class="sidebar">
+    <h2>Options</h2>
+    <ul>
+        <a href="" class="nav-link" data-target="home"><li>Home</li></a>
+        <a href="" class="nav-link" data-target="estimates"><li>Estimates</li></a>
+        <a href="" class="nav-link" data-target="employees"><li>Employees</li></a>
+        <a href="" class="nav-link" data-target="projects"><li>Projects</li></a>
+        <a href="{{ url_for('home') }}"><li>Logout</li></a>
+    </ul>
+</div>
+
+<div class="main-content">
+    <header class="content-header">
+        <h1>Owner Home Page</h1>
+    </header>
+    <div class="table-div">
+        <div class="table-container">
+            <h2 class="table-headers">Profile</h2>
+            <table class="profile-table">
+                <tbody id="profile-table-body">
+                <!-- Dynamic rows will be added here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="table-buttons">
+        <button id="edit-profile-btn">Edit Profile</button>
+    </div>
+    <div id="edit-profile-form-container" class="hidden">
+        <h2>Change Profile</h2>
+        <form id="edit-profile-form" class="registration-form">
+            <label for="fname">First Name</label>
+            <input type="text" id="fname" name="fname" placeholder="Enter your first name" required>
+
+            <label for="lname">Last Name</label>
+            <input type="text" id="lname" name="lname" placeholder="Enter your last name" required>
+
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter new username" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter new password" required>
+
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" name="phone" placeholder="Enter new phone number" required>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="Enter new email" required>
+
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='OwnerMain.js') }}"></script>
+</body>
+</html>

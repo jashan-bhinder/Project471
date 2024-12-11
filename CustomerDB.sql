@@ -12,17 +12,20 @@ CREATE TABLE CUSTOMER (
 );
 
 CREATE TABLE EMPLOYEE (
-                          EMPLOYEE_ID CHAR(9) NOT NULL,
-                          FNAME VARCHAR(15) NOT NULL,
-                          LNAME VARCHAR(15),
-                          PHONE_NUMBER INT(10) NOT NULL,
-                          START_DATE DATE NOT NULL,
-                          USERNAME VARCHAR(35) NOT NULL,
-                          PASSWORD VARCHAR(99) NOT NULL,
-                          EMAIL VARCHAR(50) NOT NULL,
+                          EMPLOYEE_ID    CHAR(9)        NOT NULL,
+                          FNAME          VARCHAR(15)    NOT NULL,
+                          LNAME          VARCHAR(15),
+                          PHONE_NUMBER   INT(10)        NOT NULL,
+                          START_DATE     DATE           NOT NULL,
+                          USERNAME       VARCHAR(35)    NOT NULL,
+                          PASSWORD       VARCHAR(99)    NOT NULL,
+                          EMAIL          VARCHAR(50)    NOT NULL,
+                          IS_OWNER       BOOLEAN        NOT NULL DEFAULT FALSE,
+                          IS_WORKER      BOOLEAN        NOT NULL DEFAULT TRUE,
                           PRIMARY KEY (EMPLOYEE_ID),
                           UNIQUE (USERNAME),
-                          UNIQUE (EMAIL)
+                          UNIQUE (EMAIL),
+                          CONSTRAINT CHECK_ROLE CHECK (IS_OWNER != IS_WORKER)
 );
 
 CREATE TABLE OWNER (
@@ -33,28 +36,26 @@ CREATE TABLE OWNER (
                            ON UPDATE CASCADE
 );
 
+
 CREATE TABLE ESTIMATE (
-                          ESTIMATE_NUM INT NOT NULL,  -- Unique estimate number
-                          ADDRESS VARCHAR(100) NOT NULL,  -- Address provided by the customer
-                          PROJECT_COST INT NULL,  -- Initially NULL, set when the estimate is accepted
-                          ESTIMATE_PDF BLOB NULL,  -- Initially NULL, set when the estimate is accepted
-                          GST INT NULL,  -- Initially NULL, calculated when the estimate is accepted
-                          TOTAL INT NULL,  -- Initially NULL, calculated when the estimate is accepted
-                          PENDING_STATUS BOOLEAN NOT NULL DEFAULT TRUE,  -- Default status is pending
-                          REQUEST_DATE DATE NOT NULL,  -- Automatically set to the current date
-                          CREATION_DATE DATE NULL,  -- Initially NULL, set when the estimate is accepted
-                          EMPLOYEE_ID CHAR(9) NOT NULL DEFAULT 'E00000001',  -- Default owner ID
-                          CUSTOMER_ID CHAR(9) NOT NULL DEFAULT '999999999',  -- Default customer ID
+                          ESTIMATE_NUM INT NOT NULL,
+                          ADDRESS VARCHAR(100) NOT NULL,
+                          PROJECT_COST INT NULL,
+                          ESTIMATE_PDF BLOB NULL,
+                          GST INT NULL CHECK (GST IS NULL OR PROJECT_COST * 0.05 = GST),
+                          TOTAL INT NULL CHECK (TOTAL IS NULL OR PROJECT_COST + GST = TOTAL),
+                          PENDING_STATUS BOOLEAN NOT NULL DEFAULT TRUE,
+                          REQUEST_DATE DATE NOT NULL,
+                          CREATION_DATE DATE NULL,
+                          EMPLOYEE_ID CHAR(9) NOT NULL DEFAULT 'E00000001',
+                          CUSTOMER_ID CHAR(9) NOT NULL DEFAULT '999999999',
                           PRIMARY KEY (ESTIMATE_NUM),
-                          CONSTRAINT CHK_GST CHECK (GST IS NULL OR PROJECT_COST * 0.05 = GST),  -- Ensure GST is valid if not NULL
-                          CONSTRAINT CHK_TOTAL CHECK (TOTAL IS NULL OR PROJECT_COST + GST = TOTAL),  -- Ensure TOTAL is valid if not NULL
                           FOREIGN KEY (CUSTOMER_ID) REFERENCES CUSTOMER (CUSTOMER_ID)
-                              ON DELETE SET DEFAULT
-                              ON UPDATE CASCADE,
-                          FOREIGN KEY (EMPLOYEE_ID) REFERENCES OWNER (EMPLOYEE_ID)
-                              ON DELETE SET DEFAULT
-                              ON UPDATE CASCADE
+                              ON DELETE RESTRICT ON UPDATE CASCADE,
+                          FOREIGN KEY (EMPLOYEE_ID) REFERENCES EMPLOYEE (EMPLOYEE_ID)
+                              ON DELETE RESTRICT ON UPDATE CASCADE
 );
+
 
 CREATE TABLE COMPLETION_CERTIFICATE (
                                         CERTIFICATE_NUM INT NOT NULL,
@@ -133,5 +134,57 @@ CREATE TABLE SIGNS_CERTIFICATE (
                                    FOREIGN KEY (PROJECT_NUM) REFERENCES PROJECT (PROJECT_NUM)
                                        ON DELETE CASCADE
                                        ON UPDATE CASCADE
+);
+
+CREATE TABLE ORDERS (
+                         ORDER_NUM        INT         NOT NULL,
+                         STORE_NAME       VARCHAR(50) NOT NULL,
+                         COMPLETION_STAT  BOOLEAN     NOT NULL DEFAULT FALSE,
+                         PROJECT_NUM      INT         NOT NULL DEFAULT 999999999,
+                         PRIMARY KEY (ORDER_NUM),
+                         FOREIGN KEY (PROJECT_NUM) REFERENCES PROJECT (PROJECT_NUM)
+                             ON DELETE SET DEFAULT
+                             ON UPDATE CASCADE
+);
+
+CREATE TABLE MATERIALS (
+                           MATERIAL_ID      CHAR(15)    NOT NULL,
+                           NAME             VARCHAR(50) NOT NULL,
+                           TYPE             VARCHAR(30) NOT NULL,
+                           COST             INT         NOT NULL,
+                           AMOUNT           INT         NOT NULL,
+                           ORDER_NUM        INT         NOT NULL,
+                           PRIMARY KEY (MATERIAL_ID),
+                           FOREIGN KEY (ORDER_NUM) REFERENCES ORDERS (ORDER_NUM)
+                               ON DELETE CASCADE
+                               ON UPDATE CASCADE
+);
+
+CREATE TABLE WORKS_ON (
+                          EMPLOYEE_ID      CHAR(9)     NOT NULL, -- Matches EMPLOYEE_ID definition
+                          PROJECT_NUM      INT         NOT NULL,
+                          PRIMARY KEY (EMPLOYEE_ID, PROJECT_NUM), -- Allow multiple projects per employee
+                          FOREIGN KEY (EMPLOYEE_ID) REFERENCES EMPLOYEE (EMPLOYEE_ID)
+                              ON DELETE CASCADE
+                              ON UPDATE CASCADE,
+                          FOREIGN KEY (PROJECT_NUM) REFERENCES PROJECT (PROJECT_NUM)
+                              ON DELETE CASCADE
+                              ON UPDATE CASCADE
+);
+
+CREATE TABLE INCLUDES (
+                          PROJECT_NUM      INT         NOT NULL,
+                          ESTIMATE_NUM     INT         NOT NULL,
+                          MATERIAL_ID      CHAR(15)    NOT NULL,
+                          PRIMARY KEY (PROJECT_NUM, ESTIMATE_NUM, MATERIAL_ID),
+                          FOREIGN KEY (PROJECT_NUM) REFERENCES PROJECT (PROJECT_NUM)
+                              ON DELETE CASCADE
+                              ON UPDATE CASCADE,
+                          FOREIGN KEY (ESTIMATE_NUM) REFERENCES ESTIMATE (ESTIMATE_NUM)
+                              ON DELETE CASCADE
+                              ON UPDATE CASCADE,
+                          FOREIGN KEY (MATERIAL_ID) REFERENCES MATERIALS (MATERIAL_ID)
+                              ON DELETE CASCADE
+                              ON UPDATE CASCADE
 );
 

@@ -11,7 +11,7 @@
 <div class="wrapper">
     <!-- Top Bar -->
     <header class="topbar">
-        <a href="HomePage.html" class="home-link">Home</a>
+        <a href='/' class="home-link">Home</a>
         <h1>Customer Dashboard</h1>
     </header>
 
@@ -21,7 +21,8 @@
             <li><a href="#" class="nav-link active" data-section="profile">Profile</a></li>
             <li><a href="#" class="nav-link" data-section="estimates">Estimates</a></li>
             <li><a href="#" class="nav-link active" data-section="project-dashboard">Projects</a></li>
-            <li><a href="#" class="nav-link" data-section="logout">Logout</a></li>
+            <li><a href="{{ url_for('home') }}">Logout</a></li>
+
         </ul>
     </nav>
 
@@ -67,6 +68,7 @@
             <!-- Button to navigate to Profile Settings -->
             <div class="center-content">
                 <button class="settings-btn" onclick="showProfileSettings()">Change Profile Settings</button>
+                <button id="delete-account-btn" class="customer_css_delete-button">Delete Account</button>
             </div>
         </section>
 
@@ -108,6 +110,22 @@
                 <button type="submit" class="settings-btn">Save Changes</button>
             </form>
         </section>
+
+        <!-- Delete Account Modal -->
+        <div id="delete-account-modal" class="customer_css_modal customer_css_hidden">
+            <div class="customer_css_modal-content">
+                <h3>Confirm Account Deletion</h3>
+                <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+                <div class="customer_css_modal-buttons">
+                    <button type="button" id="confirm-delete-btn" class="customer_css_confirm-button">Yes, Delete</button>
+                    <button type="button" id="cancel-delete-btn" class="customer_css_cancel-button">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <form id="delete-account-form" action="{{ url_for('cust_delete_customer') }}" method="POST">
+            <input type="hidden" name="customer_id" value="{{ customer['CUSTOMER_ID'] }}">
+        </form>
 
 
         <section id="estimates" class="dashboard-section hidden">
