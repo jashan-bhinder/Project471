@@ -18,6 +18,7 @@
         <ul>
             <li><a href="#" class="nav-link active" data-section="profile">Profile</a></li>
             <li><a href="#" class="nav-link" data-section="project-dashboard">Projects</a></li>
+            <li><a href="#" class="nav-link" data-section="materials-dashboard">Materials</a></li>
             <li><a href="{{ url_for('home') }}">Logout</a></li>
         </ul>
     </nav>
@@ -175,6 +176,35 @@
                 </div>
             </div>
         </section>
+        <section id="materials-dashboard" class="dashboard-section material_section hidden">
+            <h2>Your Materials</h2>
+            <div class="material_button-container">
+                <button id="material-add-btn" class="material_add-btn">Add Material</button>
+            </div>
+            <ul id="material-list" class="material_list">
+                <!-- Dynamically populated materials list -->
+            </ul>
+
+            <!-- Add Material Modal -->
+            <div id="material-add-modal" class="material_modal hidden">
+                <div class="material_modal-content">
+                    <span id="material-close-modal" class="material_close-btn">&times;</span>
+                    <h3>Add Material</h3>
+                    <form id="material-add-form">
+                        <input type="text" id="material-name" placeholder="Material Name" required>
+                        <input type="text" id="material-type" placeholder="Material Type" required>
+                        <input type="number" id="material-cost" placeholder="Material Cost" required>
+                        <input type="number" id="material-amount" placeholder="Material Amount" required>
+                        <input type="number" id="order-num" placeholder="Order Number" required>
+                        <button type="submit">Add Material</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+
+
+
     </div>
 </div>
 <script src="{{ url_for('static', filename='EmployeeMain.js') }}"></script>

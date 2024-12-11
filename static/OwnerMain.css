@@ -168,7 +168,8 @@ header {
 #add-order-form-container,
 #edit-project-form-container,
 #add-contract-form-container,
-#update-estimate-form-container {
+#update-estimate-form-container,
+#update-certificate-form-container {
     margin: 20px auto;
     max-width: 400px;
     padding: 20px;
@@ -186,7 +187,8 @@ header {
 #add-order-form-container h2,
 #edit-project-form-container h2,
 #add-contract-form-container h2,
-#update-estimate-form-container h2 {
+#update-estimate-form-container h2,
+#update-certificate-form-container h2 {
     text-align: center;
     font-size: 1.8rem;
     margin-bottom: 20px;

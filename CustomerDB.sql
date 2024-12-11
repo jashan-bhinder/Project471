@@ -57,20 +57,9 @@ CREATE TABLE ESTIMATE (
 );
 
 
-CREATE TABLE COMPLETION_CERTIFICATE (
-                                        CERTIFICATE_NUM INT NOT NULL,
-                                        CERTIFICATE_PDF BLOB NULL,
-                                        DATE DATE NOT NULL,
-                                        CUSTOMER_ID CHAR(9) NOT NULL DEFAULT '999999999',
-                                        PRIMARY KEY (CERTIFICATE_NUM),
-                                        FOREIGN KEY (CUSTOMER_ID) REFERENCES CUSTOMER (CUSTOMER_ID)
-                                            ON DELETE SET DEFAULT
-                                            ON UPDATE CASCADE
-);
-
 CREATE TABLE CONTRACT (
                           CONTRACT_NUM VARCHAR(15) NOT NULL,
-                          CONTRACT_PDF BLOB NULL,
+                          CONTRACT_PDF VARCHAR(1000) NULL,  -- Changed from BLOB to VARCHAR(1000)
                           EMPLOYEE_ID CHAR(9) NOT NULL DEFAULT '999999999',
                           CUSTOMER_ID CHAR(9) NOT NULL DEFAULT '999999999',
                           PRIMARY KEY (CONTRACT_NUM),
@@ -80,6 +69,21 @@ CREATE TABLE CONTRACT (
                           FOREIGN KEY (CUSTOMER_ID) REFERENCES CUSTOMER (CUSTOMER_ID)
                               ON DELETE SET DEFAULT
                               ON UPDATE CASCADE
+);
+
+CREATE TABLE COMPLETION_CERTIFICATE (
+                                        CERTIFICATE_NUM INT NOT NULL,
+                                        CERTIFICATE_PDF VARCHAR(1000) NULL,  -- Changed from BLOB to VARCHAR(1000)
+                                        DATE DATE NOT NULL,
+                                        CUSTOMER_ID CHAR(9) NOT NULL DEFAULT '999999999',
+                                        PROJECT_NUM INT NULL,
+                                        PRIMARY KEY (CERTIFICATE_NUM),
+                                        FOREIGN KEY (CUSTOMER_ID) REFERENCES CUSTOMER (CUSTOMER_ID)
+                                            ON DELETE SET DEFAULT
+                                            ON UPDATE CASCADE,
+                                        FOREIGN KEY (PROJECT_NUM) REFERENCES PROJECT (PROJECT_NUM)
+                                            ON DELETE SET DEFAULT
+                                            ON UPDATE CASCADE
 );
 
 CREATE TABLE PROJECT (
@@ -118,7 +122,7 @@ CREATE TABLE SIGNS_CONTRACT (
 
 CREATE TABLE SIGNS_CERTIFICATE (
                                    CERTIFICATE_NUM INT NOT NULL,
-                                   EMPLOYEE_ID CHAR(9) NOT NULL,
+                                   EMPLOYEE_ID CHAR(9) NOT NULL DEFAULT('E00000001'),
                                    CUSTOMER_ID CHAR(9) NOT NULL,
                                    PROJECT_NUM INT NOT NULL,
                                    PRIMARY KEY (EMPLOYEE_ID, CUSTOMER_ID, CERTIFICATE_NUM),
@@ -158,18 +162,6 @@ CREATE TABLE MATERIALS (
                            FOREIGN KEY (ORDER_NUM) REFERENCES ORDERS (ORDER_NUM)
                                ON DELETE CASCADE
                                ON UPDATE CASCADE
-);
-
-CREATE TABLE WORKS_ON (
-                          EMPLOYEE_ID      CHAR(9)     NOT NULL, -- Matches EMPLOYEE_ID definition
-                          PROJECT_NUM      INT         NOT NULL,
-                          PRIMARY KEY (EMPLOYEE_ID, PROJECT_NUM), -- Allow multiple projects per employee
-                          FOREIGN KEY (EMPLOYEE_ID) REFERENCES EMPLOYEE (EMPLOYEE_ID)
-                              ON DELETE CASCADE
-                              ON UPDATE CASCADE,
-                          FOREIGN KEY (PROJECT_NUM) REFERENCES PROJECT (PROJECT_NUM)
-                              ON DELETE CASCADE
-                              ON UPDATE CASCADE
 );
 
 CREATE TABLE INCLUDES (

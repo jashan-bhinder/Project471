@@ -291,10 +291,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function handleProjectSearch() {
-    const projectNumber = document.getElementById('project-num').value.trim();
+    const projectNum = document.getElementById('project-num').value.trim();
     const customerId = document.querySelector('[name="customer_id"]').value;
 
-    if (!projectNumber) {
+    if (!projectNum) {
         alert('Please enter a valid project number.');
         return;
     }
@@ -303,43 +303,38 @@ function handleProjectSearch() {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
-            project_number: projectNumber,
+            project_number: projectNum,
             customer_id: customerId,
         }),
     })
         .then(response => response.json())
         .then(data => {
-            const resultSection = document.getElementById('search-result');
-
             if (data.success) {
                 const project = data.project;
 
-                document.getElementById('result-project-num').textContent = project.PROJECT_NUM;
-                document.getElementById('result-address').textContent = project.ADDRESS;
-                document.getElementById('result-start-date').textContent = project.START_DATE;
+                // Populate the search result table
+                document.getElementById('result-project-num').textContent = project.PROJECT_NUM || 'N/A';
+                document.getElementById('result-address').textContent = project.ADDRESS || 'N/A';
+                document.getElementById('result-start-date').textContent = project.START_DATE || 'N/A';
                 document.getElementById('result-duration').textContent = project.DURATION || 'N/A';
-                document.getElementById('result-contract-num').textContent = project.CONTRACT_NUM || 'NULL';
-                document.getElementById('result-contract-pdf').innerHTML = project.CONTRACT_PDF
-                    ? `<a href="${project.CONTRACT_PDF}" target="_blank">View PDF</a>`
-                    : 'NULL';
-                document.getElementById('result-contract-date').textContent = project.CONTRACT_DATE || 'NULL';
-                document.getElementById('result-certificate-num').textContent = project.CERTIFICATE_NUM || 'NULL';
-                document.getElementById('result-certificate-pdf').innerHTML = project.CERTIFICATE_PDF
-                    ? `<a href="${project.CERTIFICATE_PDF}" target="_blank">View PDF</a>`
-                    : 'NULL';
-                document.getElementById('result-certificate-date').textContent = project.CERTIFICATE_DATE || 'NULL';
+                document.getElementById('result-contract-num').textContent = project.CONTRACT_NUM || 'N/A';
+                document.getElementById('result-contract-pdf').textContent = project.CONTRACT_PDF || 'Not Available'; // Use textContent
+                document.getElementById('result-contract-date').textContent = project.CONTRACT_DATE || 'N/A';
+                document.getElementById('result-certificate-num').textContent = project.CERTIFICATE_NUM || 'N/A';
+                document.getElementById('result-certificate-pdf').textContent = project.CERTIFICATE_PDF || 'Not Available'; // Use textContent
+                document.getElementById('result-certificate-date').textContent = project.CERTIFICATE_DATE || 'N/A';
 
-                resultSection.classList.remove('hidden'); // Show the search result
+                document.getElementById('search-result').classList.remove('hidden');
             } else {
                 alert(data.message);
-                resultSection.classList.add('hidden'); // Hide the search result if no data is found
             }
         })
         .catch(error => {
-            console.error('Error fetching project:', error);
+            console.error('Error fetching project details:', error);
             alert('An error occurred while searching for the project.');
         });
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const deleteAccountBtn = document.getElementById('delete-account-btn');

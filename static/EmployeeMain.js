@@ -369,3 +369,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+document.addEventListener('DOMContentLoaded', () => {
+    const addMaterialBtn = document.getElementById('material-add-btn'); // Button to open the modal
+    const addMaterialModal = document.getElementById('material-add-modal'); // Modal element
+    const closeMaterialModal = document.getElementById('material-close-modal'); // Close button
+    const addMaterialForm = document.getElementById('material-add-form'); // Form element
+
+    // Open the Add Material modal
+    addMaterialBtn.addEventListener('click', () => {
+        addMaterialModal.classList.remove('hidden'); // Show the modal
+    });
+
+    // Close the modal when clicking the close button
+    closeMaterialModal.addEventListener('click', () => {
+        addMaterialModal.classList.add('hidden'); // Hide the modal
+    });
+
+    // Handle Add Material form submission
+    addMaterialForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        // Collect form data (excluding Material ID, which will be generated on the backend)
+        const materialData = {
+            name: document.getElementById('material-name').value.trim(),
+            type: document.getElementById('material-type').value.trim(),
+            cost: parseInt(document.getElementById('material-cost').value.trim(), 10),
+            amount: parseInt(document.getElementById('material-amount').value.trim(), 10),
+            order_num: parseInt(document.getElementById('order-num').value.trim(), 10),
+        };
+
+        // Send data to the Flask backend
+        fetch('/add_material', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(materialData),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Material added successfully!');
+                    addMaterialModal.classList.add('hidden'); // Hide the modal
+                    addMaterialForm.reset(); // Clear the form fields
+                } else {
+                    alert(data.message || 'Failed to add material.');
+                }
+            })
+            .catch(error => {
+                console.error('Error adding material:', error);
+                alert('An error occurred while adding the material.');
+            });
+    });
+});
+
+
+
+
+
+
+
+
