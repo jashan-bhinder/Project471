@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", () => {
     const navLinks = document.querySelectorAll(".nav-link");
     const mainContent = document.querySelector(".main-content");

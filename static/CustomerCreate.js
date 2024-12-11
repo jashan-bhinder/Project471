@@ -1,3 +1,4 @@
+
 document.querySelector('.registration-form').addEventListener('submit', function (e) {
     e.preventDefault(); // Prevent form submission for validation
     const username = document.getElementById('username').value.trim();

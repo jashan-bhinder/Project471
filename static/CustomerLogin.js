@@ -1,3 +1,4 @@
+
 // Modal Functionality
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('modal');

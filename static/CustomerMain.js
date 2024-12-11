@@ -1,3 +1,4 @@
+
 const navLinks = document.querySelectorAll('.nav-link');
 const sections = document.querySelectorAll('.dashboard-section');
 

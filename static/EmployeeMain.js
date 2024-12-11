@@ -1,3 +1,4 @@
+
 // Show profile settings section
 function showProfileSettings() {
     document.querySelector('#profile').classList.add('hidden');
