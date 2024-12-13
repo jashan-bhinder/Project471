@@ -651,9 +651,9 @@ def confirm_specific_order():
         conn.close()
 
 
-@app.route('/add_material', methods=['POST'])
-def add_material():
-    data = request.get_json()  # Parse JSON data from the frontend
+@app.route('/add_material/<string:employee_id>', methods=['POST'])
+def add_material(employee_id):
+    data = request.get_json()
 
     name = data.get('name')
     material_type = data.get('type')
@@ -661,25 +661,42 @@ def add_material():
     amount = data.get('amount')
     order_num = data.get('order_num')
 
-    # Generate a unique Material ID using a timestamp
-    material_id = f"MAT-{int(time.time() * 1000)}"
-
     conn = get_db_connection()
     cursor = conn.cursor()
 
     try:
-        # Insert material data into the MATERIALS table
+        # Validate that the order exists and the employee is authorized to add materials
+        cursor.execute("""
+            SELECT 1
+            FROM WORKS_ON WO
+            JOIN PROJECT P ON WO.PROJECT_NUM = P.PROJECT_NUM
+            JOIN ORDERS O ON P.PROJECT_NUM = O.PROJECT_NUM
+            WHERE WO.EMPLOYEE_ID = ? AND O.ORDER_NUM = ?
+        """, (employee_id, order_num))
+        authorized = cursor.fetchone()
+
+        if not authorized:
+            return jsonify({"success": False, "message": "You are not authorized to add materials to this order."})
+
+        # Generate a unique Material ID
+        material_id = f"MAT-{int(time.time() * 1000)}"
+
+        # Insert the material into the MATERIALS table
         cursor.execute("""
             INSERT INTO MATERIALS (MATERIAL_ID, NAME, TYPE, COST, AMOUNT, ORDER_NUM)
             VALUES (?, ?, ?, ?, ?, ?)
         """, (material_id, name, material_type, cost, amount, order_num))
         conn.commit()
-        return jsonify({"success": True})
+
+        return jsonify({"success": True, "message": "Material added successfully."})
     except Exception as e:
         print(f"Error: {e}")
-        return jsonify({"success": False, "message": "Failed to add material."})
+        return jsonify({"success": False, "message": "An error occurred while adding the material."})
     finally:
         conn.close()
+
+
+
 
 
 

@@ -180,3 +180,14 @@ CREATE TABLE INCLUDES (
                               ON UPDATE CASCADE
 );
 
+CREATE TABLE WORKS_ON (
+                          EMPLOYEE_ID      CHAR(9)     NOT NULL,
+                          PROJECT_NUM      INT         NOT NULL,
+                          PRIMARY KEY (EMPLOYEE_ID, PROJECT_NUM),
+                          FOREIGN KEY (EMPLOYEE_ID) REFERENCES EMPLOYEE (EMPLOYEE_ID)
+                              ON DELETE CASCADE
+                              ON UPDATE CASCADE,
+                          FOREIGN KEY (PROJECT_NUM) REFERENCES PROJECT (PROJECT_NUM)
+                              ON DELETE CASCADE
+                              ON UPDATE CASCADE
+);

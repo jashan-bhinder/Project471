@@ -1070,6 +1070,14 @@ body {
 .material_modal {
     display: flex; /* Ensure the modal is visible when .hidden is removed */
 }
+.hidden {
+    display: none;
+}
+.error-message-container {
+    margin-top: 10px;
+    color: red;
+    font-size: 14px;
+}
 
 
 
