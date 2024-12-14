@@ -425,6 +425,69 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+    const viewMaterialsBtn = document.getElementById('material-view-btn'); // "View Materials" button
+    const materialsListSection = document.getElementById('materials-list-section'); // Materials section
+    const viewMaterialsForm = document.getElementById('view-materials-form'); // Form for fetching materials
+    const materialsTableBody = document.querySelector('#materials-table tbody'); // Table body for materials
+
+    if (viewMaterialsBtn) {
+        viewMaterialsBtn.addEventListener('click', () => {
+            // Toggle visibility of the materials section
+            materialsListSection.classList.remove('hidden');
+        });
+    }
+
+    if (viewMaterialsForm) {
+        viewMaterialsForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent form submission
+
+            const orderNum = document.getElementById('view-order-num').value.trim();
+            const employeeId = document.querySelector('[name="employee_id"]').value; // Assuming it's in the HTML
+
+            if (!orderNum) {
+                alert('Please enter a valid order number.');
+                return;
+            }
+
+            // Fetch materials data for the entered order number
+            fetch(`/view_materials/${employeeId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ order_num: orderNum }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Populate the materials table
+                        materialsTableBody.innerHTML = ''; // Clear previous data
+                        data.materials.forEach(material => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${material.MATERIAL_ID}</td>
+                                <td>${material.NAME}</td>
+                                <td>${material.TYPE}</td>
+                                <td>${material.COST}</td>
+                                <td>${material.AMOUNT}</td>
+                            `;
+                            materialsTableBody.appendChild(row);
+                        });
+                    } else {
+                        alert(data.message);
+                        materialsTableBody.innerHTML = '<tr><td colspan="5">No materials found.</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching materials:', error);
+                    alert('An error occurred while fetching materials.');
+                });
+        });
+    }
+});
+
+
+
+
 
 
 

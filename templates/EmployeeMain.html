@@ -181,6 +181,7 @@
             <h2>Your Materials</h2>
             <div class="material_button-container">
                 <button id="material-add-btn" class="material_add-btn">Add Material</button>
+                <button id="material-view-btn" class="material_view-btn">View Materials</button>
             </div>
             <ul id="material-list" class="material_list">
                 <!-- Dynamically populated materials list -->
@@ -201,7 +202,31 @@
                     </form>
                 </div>
             </div>
+
+            <!-- Materials List Section -->
+            <div id="materials-list-section" class="hidden">
+                <h3>Materials for Selected Order</h3>
+                <form id="view-materials-form">
+                    <input type="number" id="view-order-num" placeholder="Enter Order Number" required>
+                    <button type="submit">View Materials</button>
+                </form>
+                <table id="materials-table" class="material_table">
+                    <thead>
+                    <tr>
+                        <th>Material ID</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Cost</th>
+                        <th>Amount</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Dynamically populated materials -->
+                    </tbody>
+                </table>
+            </div>
         </section>
+
     </div>
 </div>
 <script src="{{ url_for('static', filename='EmployeeMain.js') }}"></script>

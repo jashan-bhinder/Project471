@@ -697,6 +697,56 @@ def add_material(employee_id):
 
 
 
+@app.route('/view_materials/<string:employee_id>', methods=['POST'])
+def view_materials(employee_id):
+    data = request.get_json()
+    order_num = data.get('order_num')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Validate that the employee is authorized to view materials for this order
+        cursor.execute("""
+            SELECT 1
+            FROM WORKS_ON WO
+            JOIN PROJECT P ON WO.PROJECT_NUM = P.PROJECT_NUM
+            JOIN ORDERS O ON P.PROJECT_NUM = O.PROJECT_NUM
+            WHERE WO.EMPLOYEE_ID = ? AND O.ORDER_NUM = ?
+        """, (employee_id, order_num))
+        authorized = cursor.fetchone()
+
+        if not authorized:
+            return jsonify({"success": False, "message": "You are not authorized to view materials for this order."})
+
+        # Fetch materials for the order
+        cursor.execute("""
+            SELECT MATERIAL_ID, NAME, TYPE, COST, AMOUNT
+            FROM MATERIALS
+            WHERE ORDER_NUM = ?
+        """, (order_num,))
+        materials = cursor.fetchall()
+
+        materials_data = [
+            {
+                "MATERIAL_ID": material[0],
+                "NAME": material[1],
+                "TYPE": material[2],
+                "COST": material[3],
+                "AMOUNT": material[4],
+            }
+            for material in materials
+        ]
+
+        return jsonify({"success": True, "materials": materials_data})
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"success": False, "message": "An error occurred while fetching materials."})
+    finally:
+        conn.close()
+
+
 
 
 
