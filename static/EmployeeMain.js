@@ -1,29 +1,29 @@
 
-// Show profile settings section
+
 function showProfileSettings() {
     document.querySelector('#profile').classList.add('hidden');
     document.querySelector('#profile-settings').classList.remove('hidden');
 }
 
-// Handle form submission for profile settings
+
 function saveChanges(event) {
     event.preventDefault();
     alert('Profile changes saved successfully!');
     document.querySelector('#profile-settings').classList.add('hidden');
     document.querySelector('#profile').classList.remove('hidden');
 }
-// Auto-hide flash messages after 5 seconds
+
 document.addEventListener('DOMContentLoaded', function () {
     const flashMessages = document.querySelector('.flash-messages');
     if (flashMessages) {
         setTimeout(() => {
             flashMessages.style.display = 'none';
-        }, 5000); // Adjust time as needed (5000ms = 5 seconds)
+        }, 5000);
     }
 });
-// Form validation for profile settings
+
 document.querySelector('.settings-form').addEventListener('submit', function (e) {
-    e.preventDefault(); // Prevent form submission for validation
+    e.preventDefault();
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
     const phone = document.getElementById('phone').value.trim();
@@ -33,25 +33,25 @@ document.querySelector('.settings-form').addEventListener('submit', function (e)
 
     clearErrors();
 
-    // Validate Username
+
     if (username.length < 7) {
         showError('username', 'Username is too short');
         isValid = false;
     }
 
-    // Validate Password
+
     if (password.length < 10) {
         showError('password', 'Password is too short');
         isValid = false;
     }
 
-    // Validate Phone Number
+
     if (!/^\d{10}$/.test(phone)) {
         showError('phone', 'Phone number must be 10 numbers long');
         isValid = false;
     }
 
-    // Validate Email
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         showError('email', 'Invalid email format');
         isValid = false;
@@ -62,42 +62,42 @@ document.querySelector('.settings-form').addEventListener('submit', function (e)
     }
 });
 
-// Show error messages below the input field
+
 function showError(inputId, message) {
     const inputField = document.getElementById(inputId);
-    inputField.classList.add('error-highlight'); // Highlight input field
+    inputField.classList.add('error-highlight');
     const errorElement = document.createElement('div');
     errorElement.className = 'error-message';
     errorElement.innerText = message;
     inputField.parentElement.appendChild(errorElement);
 }
 
-// Clear all error messages
+
 function clearErrors() {
     const errorMessages = document.querySelectorAll('.error-message');
     errorMessages.forEach((msg) => msg.remove());
     const errorFields = document.querySelectorAll('.error-highlight');
     errorFields.forEach((field) => field.classList.remove('error-highlight'));
 }
-// Fetch all projects and assigned projects for the employee
+
 document.addEventListener('DOMContentLoaded', () => {
     const employeeId = document.querySelector('[name="employee_id"]').value;
 
-    // Function to fetch and toggle assigned projects
+
     const fetchAssignedProjects = () => {
         const assignedProjectsSection = document.getElementById('employee_assigned-projects');
         const allProjectsSection = document.getElementById('employee_all-projects');
 
         if (!assignedProjectsSection.classList.contains('hidden')) {
-            // If the section is visible, hide it
+
             assignedProjectsSection.classList.add('hidden');
         } else {
-            // Otherwise, fetch and display assigned projects
+
             fetch(`/fetch_filtered_assigned_projects/${employeeId}`)
                 .then(response => response.json())
                 .then(data => {
                     const assignedProjectsList = document.getElementById('employee_assigned-projects-list');
-                    assignedProjectsList.innerHTML = ''; // Clear the list
+                    assignedProjectsList.innerHTML = '';
 
                     if (data.assigned_projects && data.assigned_projects.length > 0) {
                         data.assigned_projects.forEach(project => {
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         assignedProjectsList.innerHTML = '<li>No assigned projects found.</li>';
                     }
 
-                    // Show assigned projects and hide all projects section
+
                     assignedProjectsSection.classList.remove('hidden');
                     allProjectsSection.classList.add('hidden');
                 })
@@ -117,21 +117,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Function to fetch and toggle all projects
+
     const fetchAllProjects = () => {
         const allProjectsSection = document.getElementById('employee_all-projects');
         const assignedProjectsSection = document.getElementById('employee_assigned-projects');
 
         if (!allProjectsSection.classList.contains('hidden')) {
-            // If the section is visible, hide it
+
             allProjectsSection.classList.add('hidden');
         } else {
-            // Otherwise, fetch and display all projects
+
             fetch(`/fetch_all_projects_history/${employeeId}`)
                 .then(response => response.json())
                 .then(data => {
                     const allProjectsList = document.getElementById('employee_all-projects-list');
-                    allProjectsList.innerHTML = ''; // Clear the list
+                    allProjectsList.innerHTML = '';
 
                     if (data.all_projects && data.all_projects.length > 0) {
                         data.all_projects.forEach(project => {
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         allProjectsList.innerHTML = '<li>No projects found.</li>';
                     }
 
-                    // Show all projects and hide assigned projects section
+
                     allProjectsSection.classList.remove('hidden');
                     assignedProjectsSection.classList.add('hidden');
                 })
@@ -151,19 +151,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Event listeners for buttons
+
     document.getElementById('employee_view-assigned-projects-button').addEventListener('click', fetchAssignedProjects);
     document.getElementById('employee_view-all-projects-button').addEventListener('click', fetchAllProjects);
 
-    // Tab functionality for the Projects tab
+
     const projectDashboard = document.getElementById('project-dashboard');
     const projectTab = document.querySelector('.nav-link[data-section="project-dashboard"]');
 
     projectTab.addEventListener('click', () => {
         const allSections = document.querySelectorAll('.dashboard-section');
-        allSections.forEach(section => section.classList.add('hidden')); // Hide all sections
+        allSections.forEach(section => section.classList.add('hidden'));
 
-        // Show project dashboard and reset visibility of lists
+
         projectDashboard.classList.remove('hidden');
         document.getElementById('employee_assigned-projects').classList.add('hidden');
         document.getElementById('employee_all-projects').classList.add('hidden');
@@ -178,17 +178,17 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
     const employeeId = document.querySelector('[name="employee_id"]').value;
 
-    // Open Search Project modal
+
     document.getElementById('employee_search-project-button').addEventListener('click', () => {
         document.getElementById('project-search-modal').classList.remove('hidden');
     });
 
-    // Close modal functionality
+
     document.getElementById('close-modal').addEventListener('click', () => {
         document.getElementById('project-search-modal').classList.add('hidden');
     });
 
-    // Search project functionality
+
     document.getElementById('search-project-button').addEventListener('click', () => {
         const projectNumber = document.getElementById('project-num-input').value.trim();
 
@@ -209,24 +209,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 const confirmOrderFormContainer = document.getElementById('confirm-order-form-container');
 
                 if (data.success) {
-                    // Populate project details
+
                     document.getElementById('result-project-num').textContent = data.project.PROJECT_NUM;
                     document.getElementById('result-project-address').textContent = data.project.ADDRESS;
                     document.getElementById('result-project-start-date').textContent = data.project.START_TIME;
                     document.getElementById('result-project-duration').textContent = data.project.ESTIMATE_LENGTH;
 
-                    // Populate orders
+
                     ordersList.innerHTML = '';
                     if (data.orders.length > 0) {
                         data.orders.forEach(order => {
                             const li = document.createElement('li');
                             li.textContent = `Order #${order.ORDER_NUM} - Store: ${order.STORE_NAME}, Status: ${order.COMPLETION_STAT}`;
-                            li.dataset.orderNum = order.ORDER_NUM; // Store order number for reference
+                            li.dataset.orderNum = order.ORDER_NUM;
                             ordersList.appendChild(li);
                         });
 
                         confirmOrderFormContainer.classList.remove('hidden');
-                        confirmOrderFormContainer.dataset.projectNum = data.project.PROJECT_NUM; // Store project number
+                        confirmOrderFormContainer.dataset.projectNum = data.project.PROJECT_NUM;
                     } else {
                         ordersList.innerHTML = '<li>No orders found for this project.</li>';
                         confirmOrderFormContainer.classList.add('hidden');
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     resultSection.classList.add('hidden');
                 }
 
-                // Close the modal after search
+
                 document.getElementById('project-search-modal').classList.add('hidden');
             })
             .catch(error => {
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 
-    // Confirm specific order functionality
+
     document.getElementById('confirm-order-form').addEventListener('submit', (event) => {
         event.preventDefault();
 
@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data => {
                 if (data.success) {
                     alert('Order status updated successfully.');
-                    // Refresh the order details
+
                     document.getElementById('search-project-button').click();
                 } else {
                     alert(data.message);
@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-// Close modal button functionality
+
 document.getElementById('close-modal').addEventListener('click', () => {
     document.getElementById('project-search-modal').classList.add('hidden');
 });
@@ -301,25 +301,24 @@ const uniqueNavLinks = document.querySelectorAll('.nav-link');
 const uniqueSections = document.querySelectorAll('.dashboard-section');
 
 function switchToSection(targetId) {
-    // Hide all sections
+
     uniqueSections.forEach((section) => section.classList.add('hidden'));
 
-    // Show the selected section
+
     document.getElementById(targetId).classList.remove('hidden');
 }
 
-// Add event listeners for navigation links
 uniqueNavLinks.forEach((link) => {
     link.addEventListener('click', function (e) {
         e.preventDefault();
 
-        // Remove active class from all links
+
         uniqueNavLinks.forEach((nav) => nav.classList.remove('active'));
 
-        // Add active class to the clicked link
+
         this.classList.add('active');
 
-        // Show the selected section
+
         const target = this.dataset.section;
         switchToSection(target);
     });
@@ -336,7 +335,7 @@ function switchTab(event, tabId) {
     document.getElementById(tabId).classList.remove('hidden');
 }
 
-// Assign click event listeners to tab buttons
+
 projectTabs.forEach(tab => {
     tab.addEventListener('click', function (event) {
         switchTab(event, this.getAttribute('data-tab-id'));
@@ -349,18 +348,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
     const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
 
-    // Show the modal when the delete button is clicked
+
     deleteAccountBtn.addEventListener('click', () => {
         deleteModal.classList.remove('employee_css_hidden');
     });
 
-    // Handle account deletion
+
     confirmDeleteBtn.addEventListener('click', () => {
         const deleteForm = document.getElementById('delete-account-form');
-        deleteForm.submit(); // Submit the form to trigger the emp_delete_employee route
+        deleteForm.submit();
     });
 
-    // Close the modal when the cancel button is clicked
+
     cancelDeleteBtn.addEventListener('click', () => {
         deleteModal.classList.add('employee_css_hidden');
     });
@@ -400,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 order_num: parseInt(document.getElementById('order-num').value.trim(), 10),
             };
 
-            const employeeId = document.querySelector('[name="employee_id"]').value; // Assuming it's in the HTML
+            const employeeId = document.querySelector('[name="employee_id"]').value;
 
             fetch(`/add_material/${employeeId}`, {
                 method: 'POST',
@@ -426,31 +425,30 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    const viewMaterialsBtn = document.getElementById('material-view-btn'); // "View Materials" button
-    const materialsListSection = document.getElementById('materials-list-section'); // Materials section
-    const viewMaterialsForm = document.getElementById('view-materials-form'); // Form for fetching materials
-    const materialsTableBody = document.querySelector('#materials-table tbody'); // Table body for materials
+    const viewMaterialsBtn = document.getElementById('material-view-btn');
+    const materialsListSection = document.getElementById('materials-list-section');
+    const viewMaterialsForm = document.getElementById('view-materials-form');
+    const materialsTableBody = document.querySelector('#materials-table tbody');
 
     if (viewMaterialsBtn) {
         viewMaterialsBtn.addEventListener('click', () => {
-            // Toggle visibility of the materials section
+
             materialsListSection.classList.remove('hidden');
         });
     }
 
     if (viewMaterialsForm) {
         viewMaterialsForm.addEventListener('submit', (event) => {
-            event.preventDefault(); // Prevent form submission
+            event.preventDefault();
 
             const orderNum = document.getElementById('view-order-num').value.trim();
-            const employeeId = document.querySelector('[name="employee_id"]').value; // Assuming it's in the HTML
+            const employeeId = document.querySelector('[name="employee_id"]').value;
 
             if (!orderNum) {
                 alert('Please enter a valid order number.');
                 return;
             }
 
-            // Fetch materials data for the entered order number
             fetch(`/view_materials/${employeeId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -459,8 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Populate the materials table
-                        materialsTableBody.innerHTML = ''; // Clear previous data
+                        materialsTableBody.innerHTML = '';
                         data.materials.forEach(material => {
                             const row = document.createElement('tr');
                             row.innerHTML = `

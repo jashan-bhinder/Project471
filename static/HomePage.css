@@ -1,5 +1,5 @@
 
-/* General Styles */
+
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -17,7 +17,7 @@ ul {
     margin: 0;
 }
 
-/* Header Styles */
+
 .TopBar {
     background: white;
     padding: 10px 20px;
@@ -70,7 +70,7 @@ ul {
     background: #e6b800;
 }
 
-/* Hero Section */
+
 .imagebackg {
     display: flex;
     align-items: center;
@@ -108,7 +108,7 @@ ul {
     background: #e6b800;
 }
 
-/* Offer Section */
+
 .offer {
     background: #f5f5f5;
     text-align: center;

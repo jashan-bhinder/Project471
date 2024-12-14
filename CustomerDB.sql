@@ -59,7 +59,7 @@ CREATE TABLE ESTIMATE (
 
 CREATE TABLE CONTRACT (
                           CONTRACT_NUM VARCHAR(15) NOT NULL,
-                          CONTRACT_PDF VARCHAR(1000) NULL,  -- Changed from BLOB to VARCHAR(1000)
+                          CONTRACT_PDF VARCHAR(1000) NULL,
                           EMPLOYEE_ID CHAR(9) NOT NULL DEFAULT '999999999',
                           CUSTOMER_ID CHAR(9) NOT NULL DEFAULT '999999999',
                           PRIMARY KEY (CONTRACT_NUM),
@@ -73,7 +73,7 @@ CREATE TABLE CONTRACT (
 
 CREATE TABLE COMPLETION_CERTIFICATE (
                                         CERTIFICATE_NUM INT NOT NULL,
-                                        CERTIFICATE_PDF VARCHAR(1000) NULL,  -- Changed from BLOB to VARCHAR(1000)
+                                        CERTIFICATE_PDF VARCHAR(1000) NULL,
                                         DATE DATE NOT NULL,
                                         CUSTOMER_ID CHAR(9) NOT NULL DEFAULT '999999999',
                                         PROJECT_NUM INT NULL,

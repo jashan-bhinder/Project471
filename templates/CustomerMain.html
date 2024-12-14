@@ -10,13 +10,13 @@
 </head>
 <body>
 <div class="wrapper">
-    <!-- Top Bar -->
+
     <header class="topbar">
         <a href='/' class="home-link">Home</a>
         <h1>Customer Dashboard</h1>
     </header>
 
-    <!-- Sidebar -->
+
     <nav class="sidebar">
         <ul>
             <li><a href="#" class="nav-link active" data-section="profile">Profile</a></li>
@@ -27,9 +27,9 @@
         </ul>
     </nav>
 
-    <!-- Main Content -->
+
     <div class="main-content">
-        <!-- Profile Section -->
+
         <section id="profile" class="dashboard-section">
             <h2 class="center-text">Welcome to your profile, {{ customer['NAME'] }}</h2>
             <table class="profile-table">
@@ -66,14 +66,14 @@
                     <td>{{ customer['DATE_JOINED'] if 'DATE_JOINED' in customer.keys() else 'N/A' }}</td>
                 </tr>
             </table>
-            <!-- Button to navigate to Profile Settings -->
+
             <div class="center-content">
                 <button class="settings-btn" onclick="showProfileSettings()">Change Profile Settings</button>
                 <button id="delete-account-btn" class="customer_css_delete-button">Delete Account</button>
             </div>
         </section>
 
-        <!-- Profile Settings Section (Initially Hidden) -->
+
         <section id="profile-settings" class="dashboard-section hidden">
             <h2 class="center-text">Change Your Profile Settings</h2>
             <div class="flash-messages">
@@ -112,7 +112,7 @@
             </form>
         </section>
 
-        <!-- Delete Account Modal -->
+
         <div id="delete-account-modal" class="customer_css_modal customer_css_hidden">
             <div class="customer_css_modal-content">
                 <h3>Confirm Account Deletion</h3>
@@ -132,15 +132,15 @@
         <section id="estimates" class="dashboard-section hidden">
             <h2 class="center-text">Your Estimates</h2>
 
-            <!-- Always visible Pending Estimates -->
+
             <div id="always-visible-pending">
                 <h3>Pending Estimates</h3>
-                <ul id="pending-list"></ul> <!-- Pending estimates will always be shown here -->
+                <ul id="pending-list"></ul>
             </div>
 
             <div id="all-estimates" class="estimate-content hidden">
                 <h3>All Estimates</h3>
-                <ul id="all-list"></ul> <!-- All estimates will be dynamically added here -->
+                <ul id="all-list"></ul>
             </div>
 
             <div id="recent-estimate" class="estimate-content hidden">
@@ -149,7 +149,7 @@
             </div>
 
 
-            <!-- Tabs for other estimates -->
+
             <div class="estimate-tabs">
                 <button class="tab-btn active" onclick="showEstimateTab(event, 'recent-estimate')">Recently Accepted Estimate</button>
                 <button class="tab-btn" onclick="showEstimateTab(event, 'all-estimates')">All Estimates</button>
@@ -157,7 +157,7 @@
                 <button class="tab-btn" onclick="showEstimateTab(event, 'search')">Search Estimate</button>
             </div>
 
-            <!-- Tabbed Content -->
+
             <div id="recent-estimate" class="estimate-content hidden">
                 <h3>Recently Accepted Estimate</h3>
                 <p id="recent-estimate-info"></p>
@@ -178,7 +178,7 @@
                     <button class="settings-btn" type="submit">Submit</button>
                 </form>
             </div>
-            <!-- Search Estimate Section -->
+
             <div id="search" class="estimate-content hidden">
                 <h3>Search Estimate</h3>
                 <form class="search-form">
@@ -189,13 +189,13 @@
                 </form>
             </div>
 
-            <!-- Modal for Search Results -->
+
             <div id="search-modal" class="modal hidden">
                 <div class="modal-content">
                     <span class="close-btn" onclick="closeModal()">&times;</span>
                     <h4>Estimate Details</h4>
                     <div id="modal-content-container">
-                        <!-- Search results will be dynamically added here -->
+
                     </div>
                 </div>
             </div>
@@ -204,13 +204,13 @@
         <section id="project-dashboard" class="dashboard-section hidden">
             <h2 class="center-text">Your Projects</h2>
 
-            <!-- All Projects List -->
+
             <div id="all-projects-section">
                 <h3>All Projects</h3>
                 <ul id="all-projects-list"></ul>
             </div>
 
-            <!-- Search Project -->
+
             <div id="search-project-section">
                 <h3>Search Project</h3>
                 <form id="search-project-form">
@@ -220,7 +220,7 @@
                     <button type="button" onclick="handleProjectSearch()">Search</button>
                 </form>
 
-                <!-- Search Result -->
+
                 <div id="search-result" class="hidden">
                     <h4>Project Details</h4>
                     <table class="profile-table">
@@ -244,13 +244,13 @@
     </div>
 </div>
 <script>
-    // Auto-hide flash messages after 5 seconds
+
     document.addEventListener('DOMContentLoaded', function () {
         const flashMessages = document.querySelector('.flash-messages');
         if (flashMessages) {
             setTimeout(() => {
                 flashMessages.style.display = 'none';
-            }, 5000); // Adjust time as needed (5000ms = 5 seconds)
+            }, 5000);
         }
     });
     document.addEventListener('DOMContentLoaded', function () {

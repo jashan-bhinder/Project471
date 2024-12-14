@@ -17,31 +17,31 @@ navLinks.forEach((link) => {
     });
 });
 
-// Show profile settings section
+
 function showProfileSettings() {
     showSection('profile-settings');
 }
 
-// Handle form submission for profile settings
+
 function saveChanges(event) {
     event.preventDefault();
     alert('Profile changes saved successfully!');
     showSection('profile');
 }
 
-// Handle estimate tab switching
+
 function showEstimateTab(event, tabId) {
     event.preventDefault();
 
-    // Hide all tabbed content
+
     document.querySelectorAll('.estimate-content').forEach((content) =>
         content.classList.add('hidden')
     );
 
-    // Show the selected tab's content
+
     document.getElementById(tabId).classList.remove('hidden');
 
-    // Update active button styling
+
     document.querySelectorAll('.tab-btn').forEach((btn) =>
         btn.classList.remove('active')
     );
@@ -49,7 +49,7 @@ function showEstimateTab(event, tabId) {
 }
 
 
-// Fetch pending estimates
+
 document.addEventListener('DOMContentLoaded', () => {
     const customerId = document.querySelector('[name="customer_id"]').value;
     const pendingList = document.getElementById('pending-list');
@@ -57,17 +57,17 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch(`/fetch_estimates/${customerId}`)
         .then((response) => response.json())
         .then((data) => {
-            pendingList.innerHTML = ''; // Clear the list
+            pendingList.innerHTML = '';
 
             if (data.pending_estimates.length > 0) {
-                // Populate Pending Estimates
+
                 data.pending_estimates.forEach((estimate) => {
                     const li = document.createElement('li');
                     li.textContent = `Estimate #${estimate.ESTIMATE_NUM} - Requested on ${estimate.REQUEST_DATE}`;
                     pendingList.appendChild(li);
                 });
             } else {
-                // Show "No Pending Estimates" message
+
                 const li = document.createElement('li');
                 li.textContent = 'No pending estimates found.';
                 pendingList.appendChild(li);
@@ -78,9 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 });
 
-// Form validation for profile settings
+
 document.querySelector('.settings-form').addEventListener('submit', function (e) {
-    e.preventDefault(); // Prevent form submission for validation
+    e.preventDefault();
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
     const phone = document.getElementById('phone').value.trim();
@@ -90,25 +90,24 @@ document.querySelector('.settings-form').addEventListener('submit', function (e)
 
     clearErrors();
 
-    // Validate Username
+
     if (username.length < 7) {
         showError('username', 'Username is too short');
         isValid = false;
     }
 
-    // Validate Password
+
     if (password.length < 10) {
         showError('password', 'Password is too short');
         isValid = false;
     }
 
-    // Validate Phone Number
+
     if (!/^\d{10}$/.test(phone)) {
         showError('phone', 'Phone number must be 10 numbers long');
         isValid = false;
     }
 
-    // Validate Email
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         showError('email', 'Invalid email format');
         isValid = false;
@@ -119,17 +118,17 @@ document.querySelector('.settings-form').addEventListener('submit', function (e)
     }
 });
 
-// Show error messages below the input field
+
 function showError(inputId, message) {
     const inputField = document.getElementById(inputId);
-    inputField.classList.add('error-highlight'); // Highlight input field
+    inputField.classList.add('error-highlight');
     const errorElement = document.createElement('div');
     errorElement.className = 'error-message';
     errorElement.innerText = message;
     inputField.parentElement.appendChild(errorElement);
 }
 
-// Clear all error messages
+
 function clearErrors() {
     const errorMessages = document.querySelectorAll('.error-message');
     errorMessages.forEach((msg) => msg.remove());
@@ -137,24 +136,24 @@ function clearErrors() {
     errorFields.forEach((field) => field.classList.remove('error-highlight'));
 }
 
-// Submit estimate request
-document.addEventListener('DOMContentLoaded', () => {
-    const customerId = document.querySelector('[name="customer_id"]').value; // Dynamically fetch the logged-in customer ID
-    const pendingList = document.getElementById('pending-list'); // Pending Estimates list
-    const allList = document.getElementById('all-list'); // All Estimates list
-    const recentInfo = document.getElementById('recent-estimate-info'); // Recently Accepted Estimate section
 
-    // Fetch all estimates and recently accepted estimate for the customer
+document.addEventListener('DOMContentLoaded', () => {
+    const customerId = document.querySelector('[name="customer_id"]').value;
+    const pendingList = document.getElementById('pending-list');
+    const allList = document.getElementById('all-list');
+    const recentInfo = document.getElementById('recent-estimate-info');
+
+
     Promise.all([
-        fetch(`/fetch_estimates/${customerId}`).then(response => response.json()), // Fetch all estimates
-        fetch(`/fetch_recent_estimate/${customerId}`).then(response => response.json()), // Fetch recently accepted estimate
+        fetch(`/fetch_estimates/${customerId}`).then(response => response.json()),
+        fetch(`/fetch_recent_estimate/${customerId}`).then(response => response.json()),
     ])
         .then(([estimatesData, recentData]) => {
-            // Clear any previous content in the lists
+
             pendingList.innerHTML = '';
             allList.innerHTML = '';
 
-            // Populate Pending Estimates
+
             estimatesData.all_estimates.forEach(estimate => {
                 if (estimate.PENDING_STATUS) {
                     const li = document.createElement('li');
@@ -163,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // Populate All Estimates
+
             estimatesData.all_estimates.forEach(estimate => {
                 const li = document.createElement('li');
                 li.textContent = `Estimate #${estimate.ESTIMATE_NUM} - Requested on ${estimate.REQUEST_DATE} - ${
@@ -172,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 allList.appendChild(li);
             });
 
-            // Populate Recently Accepted Estimate
+
             if (recentData.recent_estimate) {
                 const estimate = recentData.recent_estimate;
                 recentInfo.textContent = `Estimate #${estimate.ESTIMATE_NUM} - Created on ${estimate.CREATION_DATE}, Address: ${estimate.ADDRESS}, Total Cost: $${estimate.TOTAL}`;
@@ -184,19 +183,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// Handle estimate request submission
+
 document.addEventListener('DOMContentLoaded', () => {
     const customerId = document.querySelector('[name="customer_id"]').value;
     const allProjectsList = document.getElementById('all-projects-list');
 
-    // Fetch all projects
+
     fetch(`/fetch_all_projects/${customerId}`)
         .then(response => response.json())
         .then(data => {
             allProjectsList.innerHTML = ''; // Clear the list
 
             if (data.all_projects && data.all_projects.length > 0) {
-                // Populate all projects
+
                 data.all_projects.forEach(project => {
                     const li = document.createElement('li');
                     li.textContent = `Project #${project.PROJECT_NUM} - Address: ${project.ADDRESS}, Start Date: ${project.START_TIME}, Duration: ${project.ESTIMATE_LENGTH}`;
@@ -213,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-// Search for an estimate
+
 function handleSearch() {
     const estimateNumber = document.getElementById('estimate-number').value.trim();
     const customerId = document.querySelector('[name="customer_id"]').value;
@@ -269,14 +268,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const customerId = document.querySelector('[name="customer_id"]').value;
     const allProjectsList = document.getElementById('all-projects-list');
 
-    // Fetch all projects
+
     fetch(`/fetch_all_projects/${customerId}`)
         .then(response => response.json())
         .then(data => {
-            allProjectsList.innerHTML = ''; // Clear the list
+            allProjectsList.innerHTML = '';
 
             if (data.all_projects.length > 0) {
-                // Populate all projects
+
                 data.all_projects.forEach(project => {
                     const li = document.createElement('li');
                     li.textContent = `Project #${project.PROJECT_NUM} - Address: ${project.ADDRESS}, Start Date: ${project.START_TIME}, Duration: ${project.ESTIMATE_LENGTH}`;
@@ -313,16 +312,15 @@ function handleProjectSearch() {
             if (data.success) {
                 const project = data.project;
 
-                // Populate the search result table
                 document.getElementById('result-project-num').textContent = project.PROJECT_NUM || 'N/A';
                 document.getElementById('result-address').textContent = project.ADDRESS || 'N/A';
                 document.getElementById('result-start-date').textContent = project.START_DATE || 'N/A';
                 document.getElementById('result-duration').textContent = project.DURATION || 'N/A';
                 document.getElementById('result-contract-num').textContent = project.CONTRACT_NUM || 'N/A';
-                document.getElementById('result-contract-pdf').textContent = project.CONTRACT_PDF || 'Not Available'; // Use textContent
+                document.getElementById('result-contract-pdf').textContent = project.CONTRACT_PDF || 'Not Available';
                 document.getElementById('result-contract-date').textContent = project.CONTRACT_DATE || 'N/A';
                 document.getElementById('result-certificate-num').textContent = project.CERTIFICATE_NUM || 'N/A';
-                document.getElementById('result-certificate-pdf').textContent = project.CERTIFICATE_PDF || 'Not Available'; // Use textContent
+                document.getElementById('result-certificate-pdf').textContent = project.CERTIFICATE_PDF || 'Not Available';
                 document.getElementById('result-certificate-date').textContent = project.CERTIFICATE_DATE || 'N/A';
 
                 document.getElementById('search-result').classList.remove('hidden');
@@ -343,18 +341,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
     const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
 
-    // Show the modal when the delete button is clicked
+
     deleteAccountBtn.addEventListener('click', () => {
         deleteModal.classList.remove('customer_css_hidden');
     });
 
-    // Handle account deletion
+
     confirmDeleteBtn.addEventListener('click', () => {
         const deleteForm = document.getElementById('delete-account-form');
-        deleteForm.submit(); // Submit the form to trigger the `cust_delete_customer` route
+        deleteForm.submit();
     });
 
-    // Close the modal when the cancel button is clicked
+
     cancelDeleteBtn.addEventListener('click', () => {
         deleteModal.classList.add('customer_css_hidden');
     });
@@ -364,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-// Close the modal
+
 function closeModal() {
     document.getElementById('search-modal').style.display = 'none';
 }

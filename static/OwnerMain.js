@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
     const navLinks = document.querySelectorAll(".nav-link");
     const mainContent = document.querySelector(".main-content");
@@ -6,10 +5,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //Function to remove all child divs except the header of the page
     function Clear_Content() {
-        const children = Array.from(mainContent.children); // Get all children of main-content
+        const children = Array.from(mainContent.children);
         children.forEach(child => {
             if (child.tagName.toLowerCase() !== "header") {
-                mainContent.removeChild(child); // Remove all elements except the header
+                mainContent.removeChild(child);
             }
         });
     }
@@ -17,9 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
     //Navigation sidebar links
     navLinks.forEach(link => {
         link.addEventListener("click", (event) => {
-            event.preventDefault(); // Prevent default link behavior
+            event.preventDefault();
 
-            // Get the target section from the `data-target` attribute
             const target = link.getAttribute("data-target");
             if (target === "estimates") {
                 Clear_Content();
@@ -49,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     </tr>
                                 </thead>
                                 <tbody id="estimate-table-body">
-                                    <!-- Dynamic rows will be added here -->
+
                                 </tbody>
                             </table>
                         </div>
@@ -125,11 +123,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Handle Delete Estimate button
                 document.getElementById('delete-estimate-link').addEventListener('click', (event) => {
-                    event.preventDefault(); // Prevent anchor default behavior
+                    event.preventDefault();
                     const estimateNum = prompt("Enter the Estimate Number to delete:");
 
                     if (estimateNum) {
-                        // Send delete request to the backend
                         fetch(`/api/estimates/delete/${estimateNum}`, {
                             method: 'DELETE',
                         })
@@ -137,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             .then(data => {
                                 if (data.success) {
                                     alert('Estimate deleted successfully!');
-                                    location.reload(); // Reload the estimate list
+                                    location.reload();
                                 } else {
                                     alert(data.error || 'An error occurred while deleting the estimate.');
                                 }
@@ -151,13 +148,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (searchEstimateButton) {
                     searchEstimateButton.addEventListener("click", (event) => {
-                        event.preventDefault(); // Prevent default link behavior
+                        event.preventDefault();
 
-                        // Prompt the user to enter the Estimate Number
                         const estimateNum = prompt("Enter the Estimate Number to search:");
 
                         if (estimateNum) {
-                            // Fetch estimate details from the backend
                             fetch(`/api/estimates/${estimateNum}`)
                                 .then((response) => {
                                     if (!response.ok) {
@@ -166,7 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                     return response.json();
                                 })
                                 .then((estimateData) => {
-                                    // Construct the estimate information
                                     let estimateInfo = `
                                         <h2>Estimate Details</h2>
                                         <p><strong>Estimate Number:</strong> ${estimateData.estimate_num}</p>
@@ -181,7 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                         <p><strong>Customer ID:</strong> ${estimateData.customer_id}</p>
                                     `;
 
-                                    // Add a link to download the PDF if available
                                     if (estimateData.pdf_url) {
                                         estimateInfo += `
                                             <p><strong>Estimate PDF:</strong> 
@@ -194,7 +187,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                         estimateInfo += `<p><strong>Estimate PDF:</strong> No PDF available</p>`;
                                     }
 
-                                    // Show the information in a pop-up window
                                     const popup = window.open("", "Estimate Details", "width=400,height=400");
                                     popup.document.write(`
                                         <html>
@@ -224,14 +216,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (updateEstimateButton) {
                     updateEstimateButton.addEventListener("click", (event) => {
-                        event.preventDefault(); // Prevent default link behavior
+                        event.preventDefault();
 
-                        // Prompt the user for the Estimate Number to update
                         const estimateNum = prompt("Enter the Estimate Number to update:");
 
-                        // Check if input is valid
                         if (estimateNum && estimateNum.trim() !== "") {
-                            // Fetch the existing estimate details
                             fetch(`/api/estimates/${estimateNum}`)
                                 .then((response) => {
                                     if (!response.ok) {
@@ -240,7 +229,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                     return response.json();
                                 })
                                 .then((estimateData) => {
-                                    // Populate the form fields with the fetched data
                                     document.getElementById("update-estimate-number").value = estimateData.estimate_num;
                                     document.getElementById("update-address").value = estimateData.address;
                                     document.getElementById("update-project-cost").value = estimateData.project_cost;
@@ -249,7 +237,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                     document.getElementById("update-pending-status").checked = estimateData.pending_status;
                                     document.getElementById("update-creation-date").value = estimateData.creation_date || "";
 
-                                    // Show the form
                                     updateEstimateFormContainer.classList.remove("hidden");
                                 })
                                 .catch((error) => {
@@ -257,20 +244,17 @@ document.addEventListener("DOMContentLoaded", () => {
                                     console.error("Error fetching estimate data:", error);
                                 });
                         }
-                        // Do nothing if input is invalid or "Cancel" is clicked
                     });
                 }
 
                 // Handle the Update Estimate form submission
                 if (updateEstimateForm) {
                     updateEstimateForm.addEventListener("submit", (event) => {
-                        event.preventDefault(); // Prevent default form submission
+                        event.preventDefault();
 
-                        // Collect form data
                         const estimateNum = document.getElementById("update-estimate-number").value;
                         const formData = new FormData(updateEstimateForm);
 
-                        // Send the update request
                         fetch(`/api/estimates/update/${estimateNum}`, {
                             method: "POST",
                             body: formData,
@@ -279,7 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             .then((data) => {
                                 if (data.success) {
                                     alert("Estimate updated successfully!");
-                                    location.reload(); // Reload the page to refresh the list
+                                    location.reload();
                                 } else {
                                     alert(data.error || "An error occurred while updating the estimate.");
                                 }
@@ -358,7 +342,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             return;
                         }
 
-                        // Populate the Profile table with employee data
                         const rows = `
                             <tr>
                                 <th>Employee ID:</th>
@@ -392,16 +375,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         tableBody.innerHTML = rows;
 
-                        // Set up the Edit Profile button functionality
+                        // handle Edit Profile button
                         const editProfileBtn = document.getElementById("edit-profile-btn");
                         const editProfileFormContainer = document.getElementById("edit-profile-form-container");
                         const editProfileForm = document.getElementById("edit-profile-form");
 
                         editProfileBtn.addEventListener("click", () => {
-                            // Toggle visibility of the edit form
                             editProfileFormContainer.classList.toggle("hidden");
 
-                            // Populate form fields with current data
                             document.getElementById("fname").value = employeeData.FNAME;
                             document.getElementById("lname").value = employeeData.LNAME;
                             document.getElementById("username").value = employeeData.USERNAME;
@@ -410,7 +391,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             document.getElementById("email").value = employeeData.EMAIL;
                         });
 
-                        // Handle form submission
                         editProfileForm.addEventListener("submit", (e) => {
                             e.preventDefault();
 
@@ -423,7 +403,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                 email: document.getElementById("email").value.trim(),
                             };
 
-                            // Validate the input data
                             if (updatedData.password.length < 10) {
                                 alert("Password must be at least 10 characters long");
                                 return;
@@ -437,7 +416,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                 return;
                             }
 
-                            // Submit updated data to the backend
                             fetch("/api/employees/update", {
                                 method: "POST",
                                 headers: {
@@ -482,7 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 newDiv.innerHTML = `
                     <div class="table-div">
                         <div class="table-container">
-                            <h2 class="table-headers">Employee List</h2>
+                            <h2 class="table-headers">Employees</h2>
                             <table class="content-tables">
                                 <thead>
                                     <tr>
@@ -535,15 +513,180 @@ document.addEventListener("DOMContentLoaded", () => {
                         </form>
                     </div>
                     
+                    <div class="table-div">
+                        <div class="table-container">
+                            <h2 class="table-headers">Employee Projects</h2>
+                            <table class="content-tables">
+                                <thead>
+                                    <tr>
+                                        <th>Employee ID</th>
+                                        <th>Project Number</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="works-on-table-body">
+                                    <!--Dynamic rows-->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="table-buttons">
+                        <a href="#" id="add-works-on-link"><button>Assign Project</button></a>
+                        <a href="#" id="delete-works-on-link"><button>Delete Project Assignment</button></a>
+                        <a href="#" id="search-works-on-link"><button>Search Employee's Projects</button></a>
+                    </div>
+                    
+                    <div id="assign-project-form-container" class="hidden">
+                        <h2>Assign Project</h2>
+                        <form id="assign-project-form" class="registration-form">
+                            <label for="assign-employee-id">Employee ID</label>
+                            <input type="text" id="assign-employee-id" name="employee_id" placeholder="Enter Employee ID" required />
+                    
+                            <label for="assign-project-num">Project Number</label>
+                            <input type="text" id="assign-project-num" name="project_num" placeholder="Enter Project Number" required />
+                    
+                            <button type="submit">Assign</button>
+                        </form>
+                    </div>
                     `;
                 mainContent.appendChild(newDiv);
 
-                // Fetch employee data from the backend
+                // handle search employee's projects button
+                const searchProjectsButton = document.getElementById("search-works-on-link");
+
+                if (searchProjectsButton) {
+                    searchProjectsButton.addEventListener("click", (event) => {
+                        event.preventDefault(); // Prevent default link behavior
+
+                        const employeeId = prompt("Enter the Employee ID to search:");
+
+                        if (employeeId) {
+                            fetch(`/api/works_on/search/${employeeId}`)
+                                .then((response) => {
+                                    if (!response.ok) {
+                                        throw new Error("Employee not found or an error occurred.");
+                                    }
+                                    return response.json();
+                                })
+                                .then((data) => {
+                                    if (data.employee && data.projects) {
+                                        const employeeInfo = `
+                                            <h2>Employee Details</h2>
+                                            <p><strong>ID:</strong> ${data.employee.id}</p>
+                                            <p><strong>First Name:</strong> ${data.employee.first_name}</p>
+                                            <p><strong>Last Name:</strong> ${data.employee.last_name}</p>
+                                            <p><strong>Phone:</strong> ${data.employee.phone}</p>
+                                            <p><strong>Email:</strong> ${data.employee.email}</p>
+                                            <h3>Projects</h3>
+                                            <ul>
+                                                ${data.projects.map((project) => `<li>${project}</li>`).join("")}
+                                            </ul>
+                                        `;
+
+                                        const popup = window.open("", "Employee Projects", "width=500,height=500");
+                                        popup.document.write(`
+                                            <html>
+                                                <head>
+                                                    <title>Employee Projects</title>
+                                                </head>
+                                                <body>
+                                                    ${employeeInfo}
+                                                    <button onclick="window.close()">Close</button>
+                                                </body>
+                                            </html>
+                                        `);
+                                    } else {
+                                        alert("No projects found for this employee.");
+                                    }
+                                })
+                                .catch((error) => {
+                                    alert(error.message || "An error occurred while searching for the employee's projects.");
+                                    console.error("Error fetching employee projects:", error);
+                                });
+                        }
+                    });
+                }
+
+                // handle delete project assignment button
+                const deleteProjectAssignmentButton = document.getElementById("delete-works-on-link");
+
+                if (deleteProjectAssignmentButton) {
+                    deleteProjectAssignmentButton.addEventListener("click", (event) => {
+                        event.preventDefault();
+
+                        const employeeId = prompt("Enter the Employee ID:");
+                        const projectNum = prompt("Enter the Project Number:");
+
+                        if (employeeId && projectNum) {
+                            fetch('/api/works_on/delete', {
+                                method: 'DELETE',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ employee_id: employeeId, project_num: projectNum }),
+                            })
+                                .then((response) => response.json())
+                                .then((data) => {
+                                    if (data.success) {
+                                        alert(data.message);
+                                        location.reload();
+                                    } else {
+                                        alert(data.error || "An error occurred.");
+                                    }
+                                })
+                                .catch((error) => {
+                                    alert("An unexpected error occurred. Please try again.");
+                                    console.error("Error deleting project assignment:", error);
+                                });
+                        } else {
+                            alert("Employee ID and Project Number are required.");
+                        }
+                    });
+                }
+
+
+                // handle assign project button
+                const assignProjectButton = document.getElementById("add-works-on-link");
+                const assignProjectFormContainer = document.getElementById("assign-project-form-container");
+                const assignProjectForm = document.getElementById("assign-project-form");
+
+                if (assignProjectButton) {
+                    assignProjectButton.addEventListener("click", (event) => {
+                        event.preventDefault();
+                        assignProjectFormContainer.classList.toggle("hidden");
+                    });
+                }
+                // handle form submission
+                if (assignProjectForm) {
+                    assignProjectForm.addEventListener("submit", (event) => {
+                        event.preventDefault();
+
+                        const formData = new FormData(assignProjectForm);
+
+                        fetch('/api/works_on/assign', {
+                            method: "POST",
+                            body: formData,
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert(data.message);
+                                    location.reload(); // Reload the page
+                                } else {
+                                    alert(data.error || "An error occurred.");
+                                }
+                            })
+                            .catch(error => {
+                                console.error("Error:", error);
+                                alert("An unexpected error occurred.");
+                            });
+                    });
+                }
+
+                // Fetch all employees from the backend
                 fetch('/api/employees')
                     .then(response => response.json())
                     .then(data => {
                         const tableBody = document.getElementById('employee-table-body');
-                        tableBody.innerHTML = ''; // Clear any existing rows
+                        tableBody.innerHTML = ''; // Clear existing rows
                         data.employees.forEach(employee => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
@@ -560,13 +703,31 @@ document.addEventListener("DOMContentLoaded", () => {
                     .catch(error => console.error('Error fetching employee data:', error));
 
 
-                // Handle Delete Employee button
+                // fetch works_on table from back end
+                fetch('/api/works_on')
+                    .then(response => response.json())
+                    .then(data => {
+                        const tableBody = document.getElementById('works-on-table-body');
+                        tableBody.innerHTML = '';
+                        data.works_on.forEach(works_on => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${works_on.employee_id}</td>
+                                <td>${works_on.project_num}</td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching assigned project data:', error));
+
+
+
+                // Handle delete employee button
                 document.getElementById('delete-employee-link').addEventListener('click', (event) => {
                     event.preventDefault(); // Prevent anchor default behavior
                     const employeeId = prompt("Enter the Employee ID to delete:");
 
                     if (employeeId) {
-                        // Send delete request to the backend
                         fetch(`/api/employees/delete/${employeeId}`, {
                             method: 'DELETE',
                         })
@@ -587,7 +748,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById('create-employee-link').addEventListener('click', (event) => {
                     event.preventDefault();
                     const formContainer = document.getElementById('create-employee-form-container');
-                    formContainer.classList.toggle('hidden'); // Toggle the visibility of the form
+                    formContainer.classList.toggle('hidden');
                 });
 
                 // Handle form submission
@@ -604,7 +765,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         start_date: document.getElementById('new-start-date').value.trim(),
                     };
 
-                    // Validation checks
                     if (newEmployeeData.password.length < 10) {
                         alert("Password must be at least 10 characters long");
                         return;
@@ -643,11 +803,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     searchEmployeeButton.addEventListener("click", (event) => {
                         event.preventDefault(); // Prevent default link behavior
 
-                        // Prompt the user to enter the Employee ID
                         const employeeId = prompt("Enter the Employee ID to search:");
 
                         if (employeeId) {
-                            // Fetch employee details from the backend
                             fetch(`/api/employees/${employeeId}`)
                                 .then((response) => {
                                     if (!response.ok) {
@@ -656,7 +814,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                     return response.json();
                                 })
                                 .then((employeeData) => {
-                                    // Construct the employee information
                                     const employeeInfo = `
                                         <h2>Employee Details</h2>
                                         <p><strong>ID:</strong> ${employeeData.id}</p>
@@ -667,7 +824,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                         <p><strong>Start Date:</strong> ${employeeData.start_date}</p>
                                     `;
 
-                                    // Show the information in a pop-up window
                                     const popup = window.open("", "Employee Details", "width=400,height=400");
                                     popup.document.write(`
                                         <html>
@@ -714,7 +870,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     </tr>
                                 </thead>
                                 <tbody id="project-table-body">
-                                   <!-- Dynamic rows will be added here -->
+                                   <!-- Dynamic rows -->
                                </tbody>
                            </table>
                         </div>
@@ -734,7 +890,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <input type="text" id="estimate-length" name="estimate-length" placeholder="Enter estimate length" required>
                     
                             <label for="start-time">Start Time</label>
-                            <input type="datetime-local" id="start-time" name="start-time" required>
+                            <input type="date" id="start-time" name="start-time" required>
                     
                             <label for="address">Address</label>
                             <input type="text" id="address" name="address" placeholder="Enter project address" required>
@@ -772,14 +928,14 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <thead>
                                     <tr>
                                         <th>Certificate Number</th>
-                                        <th>Certificate PDF</th>
+                                        <th>Certificate Text</th>
                                         <th>Date</th>
                                         <th>Customer ID</th>
                                         <th>Project Number</th>
                                     </tr>
                                 </thead>
                                 <tbody id="certificate-table-body">
-                                    <!-- Dynamic rows will be added here -->
+                                    <!-- Dynamic rows -->
                                 </tbody>
                             </table>
                         </div>
@@ -810,7 +966,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <button type="submit">Create Certificate</button>
                         </form>
                     </div>
-                    
+
                     <div id="update-certificate-form-container" class="hidden">
                         <h2>Update Certificate</h2>
                         <form id="update-certificate-form" class="registration-form">
@@ -818,17 +974,17 @@ document.addEventListener("DOMContentLoaded", () => {
                             <input type="text" id="update-certificate-number" name="certificate-number" readonly required />
                     
                             <label for="update-certificate-text">Certificate Text</label>
-                            <textarea id="update-certificate-text" name="certificate-text" placeholder="Enter certificate text" required></textarea>
+                            <textarea id="update-certificate-text" name="certificate_text" placeholder="Enter certificate text" required></textarea>
                     
                             <label for="update-date">Date</label>
                             <input type="date" id="update-date" name="date" required />
                     
                             <label for="update-customer-id">Customer ID</label>
-                            <input type="text" id="update-customer-id" name="customer_id" placeholder="Enter Customer ID" required />
+                            <input type="text" id="update-customer-id" name="customer_id" readonly required />
                     
                             <label for="update-project-number">Project Number</label>
-                            <input type="text" id="update-project-number" name="project_num" placeholder="Enter Project Number" />
-                    
+                            <input type="text" id="update-project-number" name="project_num" readonly />
+                            
                             <button type="submit">Save Changes</button>
                         </form>
                     </div>
@@ -846,32 +1002,35 @@ document.addEventListener("DOMContentLoaded", () => {
                                     </tr>
                                 </thead>
                                 <tbody id="order-table-body">
-                                    <!-- Dynamic rows will be added here -->
+                                    <!-- Dynamic rows -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     
                     <div class="table-buttons">
-                        <a href="" id="add-order-link"><button>Add Order</button></a>
-                        <a href="" id="delete-order-link"><button>Delete Order</button></a>
+                        <a href="#" id="add-order-link"><button>Add Order</button></a>
+                        <a href="#" id="delete-order-link"><button>Delete Order</button></a>
                         <a href="#" id="search-order-link"><button>Search Order</button></a>
                         <a href="#" id="update-order-status-link"><button>Update Order Status</button></a>
                     </div>
                     
-                    <div id="add-order-form-container" class="hidden">
+                   <div id="add-order-form-container" class="hidden">
                         <h2>Add Order</h2>
                         <form id="add-order-form" class="registration-form">
                             <label for="store-name">Store Name</label>
-                            <input type="text" id="store-name" name="store-name" placeholder="Enter store name" required>
+                            <input type="text" id="store-name" name="store_name" placeholder="Enter store name" required>
                     
-                            <label for="completion-status">Completion Status</label>
-                            <input type="checkbox" id="completion-status" name="completion-status">
+                            <label for="project-num">Project Number</label>
+                            <input type="text" id="project-num" name="project_num" placeholder="Enter project number" required>
                     
-                            <label for="project-number">Project Number</label>
-                            <input type="text" id="project-number" name="project-number" placeholder="Enter project number" required>
+                            <label for="completion-stat">Completion Status</label>
+                            <select id="completion-stat" name="completion_stat">
+                                <option value="0">Pending</option>
+                                <option value="1">Completed</option>
+                            </select>
                     
-                            <button type="submit">Create Order</button>
+                            <button type="submit">Add Order</button>
                         </form>
                     </div>
                     
@@ -904,7 +1063,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     </tr>
                                 </thead>
                                 <tbody id="contract-table-body">
-                                    <!-- Dynamic rows will be added here -->
+                                    <!-- Dynamic rows -->
                                 </tbody>
                             </table>
                         </div>
@@ -913,29 +1072,41 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div class="table-buttons">
                         <a href="#" id="add-contract-link"><button>Add Contract</button></a>
                         <a href="#" id="delete-contract-link"><button>Delete Contract</button></a>
-                        <a href="#"><button>Search Contract</button></a>
-                        <a href="#"><button>Edit Contract</button></a>
+                        <a href="#" id="search-contract-link"><button>Search Contract</button></a>
+                        <a href="#" id="edit-contract-link"><button>Edit Contract Text</button></a>
                     </div>
                     
                     <div id="add-contract-form-container" class="hidden">
-                        <h2>Add Contract</h2>
+                        <h2>Add New Contract</h2>
                         <form id="add-contract-form" class="registration-form">
-                            <label for="contract-text">Contract Text</label>
-                            <textarea id="contract-text" name="contract-text" placeholder="Enter contract text" required></textarea>
-                        
+                            <label for="contract-pdf">Contract Text</label>
+                            <textarea id="contract-pdf" name="contract_pdf" placeholder="Enter contract text" required></textarea>
+                    
                             <label for="employee-id">Employee ID</label>
-                            <input type="text" id="employee-id" name="employee-id" placeholder="Enter employee ID" required>
-                        
+                            <input type="text" id="employee-id" name="employee_id" placeholder="Enter employee ID" required>
+                    
                             <label for="customer-id">Customer ID</label>
-                            <input type="text" id="customer-id" name="customer-id" placeholder="Enter customer ID" required>
-                        
-                            <label for="project-num">Project Number</label>
-                            <input type="text" id="project-num" name="project-num" placeholder="Enter project number" required>
-                        
-                            <label for="date">Contract Date</label>
-                            <input type="date" id="date" name="date" required> <!-- Added date field -->
-                        
-                            <button type="submit">Create Contract</button>
+                            <input type="text" id="customer-id" name="customer_id" placeholder="Enter customer ID" required>
+                    
+                            <label for="project-number">Project Number</label>
+                            <input type="text" id="project-number" name="project_num" placeholder="Enter project number" required>
+                    
+                            <label for="contract-date">Date</label>
+                            <input type="date" id="contract-date" name="date" required>
+                    
+                            <button type="submit">Add Contract</button>
+                        </form>
+                    </div>
+                    
+                    <div id="edit-contract-form-container" class="hidden">
+                        <h2>Edit Contract</h2>
+                        <form id="edit-contract-form" class="registration-form">
+                            <input type="hidden" id="edit-contract-number" name="contract_number">
+                    
+                            <label for="edit-contract-text">Contract Text:</label>
+                            <textarea id="edit-contract-text" name="contract_text" rows="5" placeholder="Enter new contract text" required></textarea>
+                    
+                            <button type="submit">Save Changes</button>
                         </form>
                     </div>
                     
@@ -954,27 +1125,137 @@ document.addEventListener("DOMContentLoaded", () => {
                                     </tr>
                                 </thead>
                                 <tbody id="materials-table-body">
-                                    <!-- Dynamic rows will be added here -->
+                                    <!-- Dynamic rows -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     
                     <div class="table-buttons">
-                        <a href="#"><button>Add Material</button></a>
+                        <a href="#" id="add-material-link"><button>Add Material</button></a>
                         <a href="#" id="delete-material-link"><button>Delete Material</button></a>
-                        <a href="#"><button>Search Material</button></a>
+                        <a href="#" id="search-material-link"><button>Search Material</button></a>
                     </div>
-                   
+                    
+                    <div id="add-material-form-container" class="hidden">
+                        <h2>Add Material</h2>
+                        <form id="add-material-form" class="registration-form">
+                            <label for="material-name">Material Name:</label>
+                            <input type="text" id="material-name" name="name" placeholder="Enter material name" required>
+                    
+                            <label for="material-type">Material Type:</label>
+                            <input type="text" id="material-type" name="type" placeholder="Enter material type" required>
+                    
+                            <label for="material-cost">Cost:</label>
+                            <input type="text" id="material-cost" name="cost" placeholder="Enter material cost" required>
+                    
+                            <label for="material-amount">Amount:</label>
+                            <input type="text" id="material-amount" name="amount" placeholder="Enter material amount" required>
+                    
+                            <label for="order-number">Order Number:</label>
+                            <input type="text" id="order-number" name="order_num" placeholder="Enter associated order number" required>
+                    
+                            <button type="submit">Add Material</button>
+                        </form>
+                    </div> 
                 `;
                 mainContent.appendChild(newDiv);
 
-                // Fetch project from database from the backend
+
+                // handle search material button
+                const searchMaterialButton = document.getElementById("search-material-link");
+
+                if (searchMaterialButton) {
+                    searchMaterialButton.addEventListener("click", (event) => {
+                        event.preventDefault();
+
+                        const materialId = prompt("Enter the Material ID to search:");
+
+                        if (materialId && materialId.trim() !== "") {
+                            // Fetch material details from the backend
+                            fetch(`/api/materials/search/${materialId}`)
+                                .then((response) => {
+                                    if (!response.ok) {
+                                        throw new Error("Material not found or an error occurred.");
+                                    }
+                                    return response.json();
+                                })
+                                .then((materialData) => {
+                                    const materialInfo = `
+                                        <h2>Material Details</h2>
+                                        <p><strong>Material ID:</strong> ${materialData.material_id}</p>
+                                        <p><strong>Name:</strong> ${materialData.name}</p>
+                                        <p><strong>Type:</strong> ${materialData.type}</p>
+                                        <p><strong>Cost:</strong> ${materialData.cost}</p>
+                                        <p><strong>Amount:</strong> ${materialData.amount}</p>
+                                        <p><strong>Order Number:</strong> ${materialData.order_num}</p>
+                                    `;
+
+                                    const popup = window.open("", "Material Details", "width=400,height=400");
+                                    popup.document.write(`
+                                        <html>
+                                            <head>
+                                                <title>Material Details</title>
+                                            </head>
+                                            <body>
+                                                ${materialInfo}
+                                                <button onclick="window.close()">Close</button>
+                                            </body>
+                                        </html>
+                                    `);
+                                })
+                                .catch((error) => {
+                                    alert(error.message || "An error occurred while searching for the material.");
+                                    console.error("Error fetching material data:", error);
+                                });
+                        }
+                    });
+                }
+
+
+                // handle add material button
+                const addMaterialButton = document.getElementById("add-material-link");
+
+                if (addMaterialButton) {
+                    addMaterialButton.addEventListener("click", (event) => {
+                        event.preventDefault(); // Prevent default link behavior
+                        document.getElementById("add-material-form-container").classList.toggle("hidden");
+                    });
+                }
+
+                // Handle form submission for adding a material
+                document.getElementById("add-material-form").addEventListener("submit", (event) => {
+                    event.preventDefault(); // Prevent default form submission
+
+                    const formData = new FormData(document.getElementById("add-material-form"));
+
+                    fetch(`/api/materials/create`, {
+                        method: "POST",
+                        body: formData,
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                alert("Material added successfully!");
+                                location.reload(); // Reload the page to refresh the data
+                            } else {
+                                alert(data.error || "An error occurred while adding the material.");
+                            }
+                        })
+                        .catch((error) => {
+                            alert("An unexpected error occurred. Please try again.");
+                            console.error("Error adding material:", error);
+                        });
+                });
+
+
+
+                // Fetch all projects from the backend
                 fetch('/api/projects')
                     .then(response => response.json())
                     .then(data => {
                         const tableBody = document.getElementById('project-table-body');
-                        tableBody.innerHTML = ''; // Clear any existing rows
+                        tableBody.innerHTML = '';
                         data.projects.forEach(project => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
@@ -988,12 +1269,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     })
                     .catch(error => console.error('Error fetching project data:', error));
 
-                // Fetch order data from the backend
+
+                // Fetch all orders from the backend
                 fetch('/api/orders')
                     .then(response => response.json())
                     .then(data => {
                         const tableBody = document.getElementById('order-table-body');
-                        tableBody.innerHTML = ''; // Clear any existing rows
+                        tableBody.innerHTML = ''; //
                         data.orders.forEach(order => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
@@ -1007,17 +1289,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     })
                     .catch(error => console.error('Error fetching order data:', error));
 
-                // Fetch certificate data from the back
+
+                // Fetch all certificates from the backend
                 fetch('/api/certificates')
                     .then(response => response.json())
                     .then(data => {
                         const tableBody = document.getElementById('certificate-table-body');
-                        tableBody.innerHTML = ''; // Clear any existing rows
+                        tableBody.innerHTML = '';
                         data.certificates.forEach(certificate => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
                                 <td>${certificate.certificate_num}</td>
-                                <td><a href="/api/certificates/download/${certificate.certificate_num}" target="_blank">Download PDF</a></td>
+                                <td>${certificate.certificate_pdf}</td>
                                 <td>${certificate.date}</td>
                                 <td>${certificate.customer_id}</td>
                                 <td>${certificate.project_num}</td>
@@ -1027,12 +1310,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     })
                     .catch(error => console.error('Error fetching certificate data:', error));
 
+
                 // Fetch contract data from the backend
                 fetch('/api/contracts')
                     .then(response => response.json())
                     .then(data => {
                         const tableBody = document.getElementById('contract-table-body');
-                        tableBody.innerHTML = ''; // Clear any existing rows
+                        tableBody.innerHTML = '';
                         data.contracts.forEach(contract => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
@@ -1046,12 +1330,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     })
                     .catch(error => console.error('Error fetching contract data:', error));
 
+
                 // fetch Material data from backend
                 fetch('/api/materials')
                     .then(response => response.json())
                     .then(data => {
                         const tableBody = document.getElementById('materials-table-body');
-                        tableBody.innerHTML = ''; // Clear any existing rows
+                        tableBody.innerHTML = '';
                         data.materials.forEach(material => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
@@ -1173,7 +1458,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 addProjectButton.addEventListener("click", (event) => {
                     event.preventDefault(); // Prevent default anchor behavior
-                    formContainer.classList.toggle("hidden"); // Toggle visibility of the form
+                    formContainer.classList.toggle("hidden");
                 });
 
                 // Handle Add Project form submission
@@ -1187,7 +1472,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         address: document.getElementById("address").value.trim(),
                     };
 
-                    // Validate inputs
                     if (!newProjectData.estimate_length) {
                         alert("Estimate Length is required.");
                         return;
@@ -1201,7 +1485,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         return;
                     }
 
-                    // Send data to the backend
                     fetch("/api/projects/create", {
                         method: "POST",
                         headers: {
@@ -1213,7 +1496,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         .then((data) => {
                             if (data.success) {
                                 alert(`Project created successfully with ID: ${data.project_num}`);
-                                location.reload(); // Reload the page to refresh the list
+                                location.reload();
                             } else {
                                 alert(data.error || "An error occurred while creating the project.");
                             }
@@ -1227,35 +1510,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 // Handle Add Certificate button visibility
-                // Handle Add Certificate button visibility
                 const addCertificateButton = document.getElementById("add-certificate-link");
                 const certificateFormContainer = document.getElementById("add-certificate-form-container");
 
-// Show the Add Certificate form when the button is clicked
                 addCertificateButton.addEventListener("click", (event) => {
                     event.preventDefault(); // Prevent default link behavior
                     certificateFormContainer.classList.toggle("hidden"); // Toggle visibility of the form
                 });
 
-// Handle Add Certificate form submission
+                // Handle Add Certificate form submission
                 document.getElementById("add-certificate-form").addEventListener("submit", (e) => {
                     e.preventDefault(); // Prevent default form submission
 
-                    // Collect the form data
                     const newCertificateData = {
-                        certificate_text: document.getElementById("certificate-text").value.trim(),
+                        certificate_pdf: document.getElementById("certificate-text").value.trim(),
                         date: document.getElementById("certificate-date").value.trim(),
                         customer_id: document.getElementById("certificate-customer-id").value.trim(),
                         project_num: document.getElementById("certificate-project-number").value.trim(),
                     };
 
-                    // Validate inputs
-                    if (!newCertificateData.certificate_text || !newCertificateData.date || !newCertificateData.customer_id) {
+                    if (!newCertificateData.certificate_pdf || !newCertificateData.date || !newCertificateData.customer_id) {
                         alert("Certificate text, date, and customer ID are required.");
                         return;
                     }
 
-                    // Send the data to the backend
                     fetch("/api/certificates/create", {
                         method: "POST",
                         headers: {
@@ -1267,22 +1545,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         .then((data) => {
                             if (data.success) {
                                 alert(`Certificate created successfully with ID: ${data.certificate_num}`);
-
-                                // Add the new certificate to the table dynamically
-                                const tableBody = document.getElementById("certificate-table-body");
-                                const row = document.createElement("tr");
-                                row.innerHTML = `
-                                    <td>${data.certificate_num}</td>
-                                    <td>${newCertificateData.certificate_text}</td>
-                                    <td>${newCertificateData.date}</td>
-                                    <td>${newCertificateData.customer_id}</td>
-                                    <td>${newCertificateData.project_num || "N/A"}</td>
-                                `;
-                                tableBody.appendChild(row);
-
-                                // Clear the form and hide it
-                                document.getElementById("add-certificate-form").reset();
-                                certificateFormContainer.classList.add("hidden");
+                                location.reload()
                             } else {
                                 alert(data.error || "An error occurred while creating the certificate.");
                             }
@@ -1293,20 +1556,15 @@ document.addEventListener("DOMContentLoaded", () => {
                         });
                 });
 
-
-
-                // Handle add project button
+                // Handle search project button
                 const searchProjectButton = document.getElementById("search-project-link");
 
                 if (searchProjectButton) {
                     searchProjectButton.addEventListener("click", (event) => {
                         event.preventDefault(); // Prevent default link behavior
 
-                        // Prompt the user to enter the Project Number
                         const projectNum = prompt("Enter the Project Number to search:");
 
-
-                        // Check if the user entered a valid input
                         if (projectNum && projectNum.trim() !== "") {
                             // Fetch project details from the backend
                             fetch(`/api/projects/${projectNum}`)
@@ -1317,7 +1575,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                     return response.json();
                                 })
                                 .then((projectData) => {
-                                    // Construct the project information
                                     const projectInfo = `
                                         <h2>Project Details</h2>
                                         <p><strong>Project Number:</strong> ${projectData.project_num}</p>
@@ -1327,7 +1584,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                         <p><strong>Employee ID:</strong> ${projectData.employee_id || "Not assigned"}</p>
                                     `;
 
-                                    // Show the information in a popup window
                                     const popup = window.open("", "Project Details", "width=400,height=400");
                                     popup.document.write(`
                                         <html>
@@ -1346,21 +1602,18 @@ document.addEventListener("DOMContentLoaded", () => {
                                     console.error("Error fetching project data:", error);
                                 });
                         }
-                        // Do nothing if the user cancels or enters invalid input
                     });
                 }
 
 
                 //Handle edit project button
                 document.getElementById("edit-project-link").addEventListener("click", (event) => {
-                    event.preventDefault(); // Prevent default link behavior
+                    event.preventDefault();
 
                     const projectNum = prompt("Enter the Project Number to edit:");
 
-                    // Validate Project Number input
-                    if (!projectNum) return; // Exit if nothing is entered
+                    if (!projectNum) return;
 
-                    // Fetch the existing project data to populate the form
                     fetch(`/api/projects/${projectNum}`)
                         .then((response) => {
                             if (!response.ok) {
@@ -1369,14 +1622,12 @@ document.addEventListener("DOMContentLoaded", () => {
                             return response.json();
                         })
                         .then((projectData) => {
-                            // Populate the form fields
                             document.getElementById("edit-project-number").value = projectData.project_num;
                             document.getElementById("edit-estimate-length").value = projectData.estimate_length;
                             document.getElementById("edit-start-time").value = projectData.start_time;
                             document.getElementById("edit-address").value = projectData.address;
                             document.getElementById("edit-employee-id").value = projectData.employee_id;
 
-                            // Show the form
                             const editProjectFormContainer = document.getElementById("edit-project-form-container");
                             editProjectFormContainer.classList.remove("hidden");
                         })
@@ -1393,7 +1644,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     const projectNum = document.getElementById("edit-project-number").value.trim();
                     const updatedData = new FormData(document.getElementById("edit-project-form"));
 
-                    // Send the updated project data to the backend
                     fetch(`/api/projects/update/${projectNum}`, {
                         method: "POST",
                         body: updatedData,
@@ -1402,7 +1652,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         .then((data) => {
                             if (data.success) {
                                 alert("Project updated successfully!");
-                                location.reload(); // Reload to refresh data
+                                location.reload();
                             } else {
                                 alert(data.error || "An error occurred while updating the project.");
                             }
@@ -1414,55 +1664,67 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
 
-                // Add Order Button and Form Logic
+                // Handle Add Order Button
+                document.getElementById('add-order-link').addEventListener('click', (event) => {
+                    event.preventDefault();
+
+                    document.getElementById('add-order-form-container').classList.toggle('hidden');
+                });
+
+                // Handle Add Order form submission
+                document.getElementById('add-order-form').addEventListener('submit', (event) => {
+                    event.preventDefault(); // Prevent default form submission
+
+                    const formData = new FormData(document.getElementById('add-order-form'));
+
+                    fetch('/api/orders/create', {
+                        method: 'POST',
+                        body: formData,
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                alert("Order added successfully!");
+                                location.reload(); // Reload the page to refresh the data
+                            } else {
+                                alert(data.error || "An error occurred while adding the order.");
+                            }
+                        })
+                        .catch((error) => {
+                            alert("An unexpected error occurred. Please try again.");
+                            console.error("Error adding order:", error);
+                        });
+                });
+
 
 
 
                 // Handle Search Certificate button
-                const searchCertificateButton = document.getElementById("search-certificate-link");
+                document.getElementById('search-certificate-link').addEventListener('click', (event) => {
+                    event.preventDefault(); // Prevent default anchor behavior
 
-                if (searchCertificateButton) {
-                    searchCertificateButton.addEventListener("click", (event) => {
-                        event.preventDefault(); // Prevent default link behavior
+                    const certificateNum = prompt("Enter the Certificate Number to search:");
 
-                        // Prompt the user to enter the Certificate Number
-                        const certificateNum = prompt("Enter the Certificate Number to search:");
+                    if (certificateNum) {
+                        fetch(`/api/certificates/${certificateNum}`)
+                            .then((response) => {
+                                if (!response.ok) {
+                                    throw new Error("Certificate not found or an error occurred.");
+                                }
+                                return response.json();
+                            })
+                            .then((certificateData) => {
+                                const certificateInfo = `
+                                    <h2>Certificate Details</h2>
+                                    <p><strong>Certificate Number:</strong> ${certificateData.certificate_num}</p>
+                                    <p><strong>Certificate Text:</strong> ${certificateData.certificate_pdf || "No text available"}</p>
+                                    <p><strong>Date:</strong> ${certificateData.date}</p>
+                                    <p><strong>Customer ID:</strong> ${certificateData.customer_id}</p>
+                                    <p><strong>Project Number:</strong> ${certificateData.project_num || "Not linked to a project"}</p>
+                                `;
 
-                        if (certificateNum && certificateNum.trim() !== "") {
-                            // Fetch certificate details from the backend
-                            fetch(`/api/certificates/search/${certificateNum}`)
-                                .then((response) => {
-                                    if (!response.ok) {
-                                        throw new Error("Certificate not found or an error occurred.");
-                                    }
-                                    return response.json();
-                                })
-                                .then((certificateData) => {
-                                    // Construct the certificate information
-                                    let certificateInfo = `
-                                        <h2>Certificate Details</h2>
-                                        <p><strong>Certificate Number:</strong> ${certificateData.certificate_num}</p>
-                                        <p><strong>Date:</strong> ${certificateData.date}</p>
-                                        <p><strong>Customer ID:</strong> ${certificateData.customer_id}</p>
-                                        <p><strong>Project Number:</strong> ${certificateData.project_num}</p>
-                                    `;
-
-                                    // Add a link to download the PDF if available
-                                    if (certificateData.pdf_url) {
-                                        certificateInfo += `
-                                            <p><strong>Certificate PDF:</strong> 
-                                                <a href="${certificateData.pdf_url}" target="_blank" download="Certificate_${certificateData.certificate_num}.pdf">
-                                                    Download PDF
-                                                </a>
-                                            </p>
-                                        `;
-                                    } else {
-                                        certificateInfo += `<p><strong>Certificate PDF:</strong> No PDF available</p>`;
-                                    }
-
-                                    // Show the information in a pop-up window
-                                    const popup = window.open("", "Certificate Details", "width=400,height=400");
-                                    popup.document.write(`
+                                const popup = window.open("", "Certificate Details", "width=400,height=400");
+                                popup.document.write(`
                                     <html>
                                         <head>
                                             <title>Certificate Details</title>
@@ -1473,155 +1735,70 @@ document.addEventListener("DOMContentLoaded", () => {
                                         </body>
                                     </html>
                                 `);
-                                })
-                                .catch((error) => {
-                                    alert(error.message || "An error occurred while searching for the certificate.");
-                                    console.error("Error fetching certificate data:", error);
-                                });
-                        }
-                        // Do nothing if input is invalid or Cancel is clicked
-                    });
-
-                    // Handle Search Order button
-                    const searchOrderButton = document.getElementById("search-order-link");
-
-                    if (searchOrderButton) {
-                        searchOrderButton.addEventListener("click", (event) => {
-                            event.preventDefault(); // Prevent default link behavior
-
-                            // Prompt the user to enter the Order Number
-                            const orderNum = prompt("Enter the Order Number to search:");
-
-                            if (orderNum) {
-                                // Fetch order details from the backend
-                                fetch(`/api/orders/search/${orderNum}`)
-                                    .then((response) => {
-                                        if (!response.ok) {
-                                            throw new Error("Order not found or an error occurred.");
-                                        }
-                                        return response.json();
-                                    })
-                                    .then((orderData) => {
-                                        // Construct the order information
-                                        let orderInfo = `
-                                            <h2>Order Details</h2>
-                                            <p><strong>Order Number:</strong> ${orderData.order_num}</p>
-                                            <p><strong>Store Name:</strong> ${orderData.store_name}</p>
-                                            <p><strong>Completion Status:</strong> ${orderData.completion_stat}</p>
-                                            <p><strong>Project Number:</strong> ${orderData.project_num}</p>
-                                        `;
-
-                                        // Show the information in a pop-up window
-                                        const popup = window.open("", "Order Details", "width=400,height=400");
-                                        popup.document.write(`
-                                            <html>
-                                                <head>
-                                                    <title>Order Details</title>
-                                                </head>
-                                                <body>
-                                                    ${orderInfo}
-                                                    <button onclick="window.close()">Close</button>
-                                                </body>
-                                            </html>
-                                        `);
-                                    })
-                                    .catch((error) => {
-                                        alert(error.message || "An error occurred while searching for the order.");
-                                        console.error("Error fetching order data:", error);
-                                    });
-                            }
-                        });
-                    }
-                }
-
-
-                // Handle Update Certificate button
-                // Handle Update Certificate button
-                const updateCertificateButton = document.getElementById("update-certificate-link");
-                const updateCertificateFormContainer = document.getElementById("update-certificate-form-container");
-                const updateCertificateForm = document.getElementById("update-certificate-form");
-
-                if (updateCertificateButton) {
-                    updateCertificateButton.addEventListener("click", (event) => {
-                        event.preventDefault(); // Prevent default link behavior
-
-                        // Prompt the user for the Certificate Number to update
-                        const certificateNum = prompt("Enter the Certificate Number to update:");
-
-                        // Check if input is valid
-                        if (certificateNum && certificateNum.trim() !== "") {
-                            // Fetch the existing certificate details
-                            fetch(`/api/certificates/search/${certificateNum}`)
-                                .then((response) => {
-                                    if (!response.ok) {
-                                        throw new Error("Certificate not found or an error occurred.");
-                                    }
-                                    return response.json();
-                                })
-                                .then((certificateData) => {
-                                    // Populate the form fields with the fetched data
-                                    document.getElementById("update-certificate-number").value = certificateData.certificate_num;
-                                    document.getElementById("update-certificate-text").value = certificateData.certificate_text || "";
-                                    document.getElementById("update-date").value = certificateData.date;
-                                    document.getElementById("update-customer-id").value = certificateData.customer_id;
-                                    document.getElementById("update-project-number").value = certificateData.project_num || "";
-
-                                    // Show the form
-                                    updateCertificateFormContainer.classList.remove("hidden");
-                                })
-                                .catch((error) => {
-                                    alert(error.message || "An error occurred while fetching the certificate details.");
-                                    console.error("Error fetching certificate data:", error);
-                                });
-                        }
-                    });
-                }
-
-// Handle the Update Certificate Form submission
-                if (updateCertificateForm) {
-                    updateCertificateForm.addEventListener("submit", (event) => {
-                        event.preventDefault(); // Prevent default form submission
-
-                        // Collect form data
-                        const certificateNum = document.getElementById("update-certificate-number").value;
-                        const updatedCertificateData = {
-                            certificate_text: document.getElementById("update-certificate-text").value.trim(),
-                            date: document.getElementById("update-date").value.trim(),
-                            customer_id: document.getElementById("update-customer-id").value.trim(),
-                            project_num: document.getElementById("update-project-number").value.trim() || null, // Allow null for project number
-                        };
-
-                        // Validation checks
-                        if (!updatedCertificateData.certificate_text || !updatedCertificateData.date || !updatedCertificateData.customer_id) {
-                            alert("Please fill in all required fields.");
-                            return;
-                        }
-
-                        // Send the updated data to the backend
-                        fetch(`/api/certificates/update/${certificateNum}`, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(updatedCertificateData),
-                        })
-                            .then((response) => response.json())
-                            .then((data) => {
-                                if (data.success) {
-                                    alert("Certificate updated successfully!");
-                                    location.reload(); // Reload the page to refresh the certificate list
-                                } else {
-                                    alert(data.error || "An error occurred while updating the certificate.");
-                                }
                             })
                             .catch((error) => {
-                                console.error("Error updating certificate:", error);
-                                alert("An unexpected error occurred. Please try again.");
+                                alert(error.message || "An error occurred while searching for the certificate.");
+                                console.error("Error fetching certificate data:", error);
                             });
-                    });
-                }
+                    }
+                });
 
 
+                // Handle Update Certificate button
+                document.getElementById('update-certificate-link').addEventListener('click', (event) => {
+                    event.preventDefault();
+
+                    const certificateNum = prompt("Enter the Certificate Number to update:");
+
+                    if (certificateNum) {
+                        fetch(`/api/certificates/${certificateNum}`)
+                            .then((response) => {
+                                if (!response.ok) {
+                                    throw new Error("Certificate not found or an error occurred.");
+                                }
+                                return response.json();
+                            })
+                            .then((certificateData) => {
+                                document.getElementById('update-certificate-number').value = certificateData.certificate_num;
+                                document.getElementById('update-certificate-text').value = certificateData.certificate_pdf;
+                                document.getElementById('update-date').value = certificateData.date;
+                                document.getElementById('update-customer-id').value = certificateData.customer_id;
+                                document.getElementById('update-project-number').value = certificateData.project_num;
+
+                                document.getElementById('update-certificate-form-container').classList.remove('hidden');
+                            })
+                            .catch((error) => {
+                                alert(error.message || "An error occurred while fetching the certificate.");
+                                console.error("Error fetching certificate data:", error);
+                            });
+                    }
+                });
+
+                // Handle form submission for updating the certificate
+                document.getElementById('update-certificate-form').addEventListener('submit', (event) => {
+                    event.preventDefault();
+
+                    const certificateNum = document.getElementById('update-certificate-number').value;
+                    const formData = new FormData(document.getElementById('update-certificate-form'));
+
+                    fetch(`/api/certificates/update/${certificateNum}`, {
+                        method: 'POST',
+                        body: formData,
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                alert("Certificate updated successfully!");
+                                location.reload();
+                            } else {
+                                alert(data.error || "An error occurred while updating the certificate.");
+                            }
+                        })
+                        .catch((error) => {
+                            alert("An unexpected error occurred. Please try again.");
+                            console.error("Error updating certificate:", error);
+                        });
+                });
 
 
                 // Handle Update Order Status button
@@ -1631,12 +1808,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (updateOrderStatusButton) {
                     updateOrderStatusButton.addEventListener("click", (event) => {
-                        event.preventDefault(); // Prevent default link behavior
+                        event.preventDefault();
 
-                        // Prompt the user for the Order Number to update
                         const orderNum = prompt("Enter the Order Number to update completion status:");
 
-                        // Check if input is valid
                         if (orderNum && orderNum.trim() !== "") {
                             // Fetch the existing order details
                             fetch(`/api/orders/search/${orderNum}`)
@@ -1647,11 +1822,9 @@ document.addEventListener("DOMContentLoaded", () => {
                                     return response.json();
                                 })
                                 .then((orderData) => {
-                                    // Populate the form fields with the fetched data
                                     document.getElementById("update-order-number").value = orderData.order_num;
                                     document.getElementById("update-completion-status").value = orderData.completion_stat === "Completed" ? 1 : 0;
 
-                                    // Show the form
                                     updateOrderStatusFormContainer.classList.remove("hidden");
                                 })
                                 .catch((error) => {
@@ -1659,7 +1832,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                     console.error("Error fetching order data:", error);
                                 });
                         }
-                        // Do nothing if input is invalid or "Cancel" is clicked
                     });
                 }
 
@@ -1668,11 +1840,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     updateOrderStatusForm.addEventListener("submit", (event) => {
                         event.preventDefault(); // Prevent default form submission
 
-                        // Collect form data
                         const orderNum = document.getElementById("update-order-number").value;
                         const formData = new FormData(updateOrderStatusForm);
 
-                        // Send the update request
                         fetch(`/api/orders/update_status/${orderNum}`, {
                             method: "POST",
                             body: formData,
@@ -1693,58 +1863,199 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 }
 
-                // Handle Add Contract button
+
+                //Search order button
+                const searchOrderButton = document.getElementById("search-order-link");
+
+                if (searchOrderButton) {
+                    searchOrderButton.addEventListener("click", (event) => {
+                        event.preventDefault(); // Prevent default link behavior
+
+                        const orderNum = prompt("Enter the Order Number to search:");
+
+                        if (orderNum && orderNum.trim() !== "") {
+                            fetch(`/api/orders/search/${orderNum}`)
+                                .then((response) => {
+                                    if (!response.ok) {
+                                        throw new Error("Order not found or an error occurred.");
+                                    }
+                                    return response.json();
+                                })
+                                .then((orderData) => {
+                                    const orderInfo = `
+                                        <h2>Order Details</h2>
+                                        <p><strong>Order Number:</strong> ${orderData.order_num}</p>
+                                        <p><strong>Store Name:</strong> ${orderData.store_name}</p>
+                                        <p><strong>Completion Status:</strong> ${orderData.completion_stat}</p>
+                                        <p><strong>Project Number:</strong> ${orderData.project_num}</p>
+                                    `;
+
+                                    const popup = window.open("", "Order Details", "width=400,height=400");
+                                    popup.document.write(`
+                                    <html>
+                                        <head>
+                                            <title>Order Details</title>
+                                        </head>
+                                        <body>
+                                            ${orderInfo}
+                                            <button onclick="window.close()">Close</button>
+                                        </body>
+                                    </html>
+                                `);
+                                })
+                                .catch((error) => {
+                                    alert(error.message || "An error occurred while searching for the order.");
+                                    console.error("Error fetching order data:", error);
+                                });
+                        }
+                    });
+                }
+
+
+                //add contract button
                 const addContractButton = document.getElementById("add-contract-link");
-                const addContractFormContainer = document.getElementById("add-contract-form-container");
 
-                addContractButton.addEventListener("click", (event) => {
-                    event.preventDefault(); // Prevent default anchor behavior
-                    addContractFormContainer.classList.toggle("hidden"); // Toggle the visibility of the form
-                });
+                if (addContractButton) {
+                    addContractButton.addEventListener("click", (event) => {
+                        event.preventDefault(); // Prevent default link behavior
 
-                // Handle Add Contract form submission
-                document.getElementById("add-contract-form").addEventListener("submit", (e) => {
-                    e.preventDefault(); // Prevent default form submission
+                        document.getElementById("add-contract-form-container").classList.toggle("hidden");
+                    });
+                }
 
-                    // Collect the form data
-                    const contractData = {
-                        contract_text: document.getElementById("contract-text").value.trim(),
-                        employee_id: document.getElementById("employee-id").value.trim(),
-                        customer_id: document.getElementById("customer-id").value.trim(),
-                        project_num: document.getElementById("project-num").value.trim(),
-                        date: document.getElementById("date").value.trim() // Added date field
-                    };
+                document.getElementById("add-contract-form").addEventListener("submit", (event) => {
+                    event.preventDefault(); // Prevent default form submission
 
-                    // Validation checks
-                    if (!contractData.contract_text || !contractData.employee_id || !contractData.customer_id || !contractData.project_num || !contractData.date) {
-                        alert("All fields are required.");
-                        return;
-                    }
+                    const formData = new FormData(document.getElementById("add-contract-form"));
 
-                    // Send data to the backend
                     fetch("/api/contracts/create", {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(contractData),
+                        body: formData,
                     })
                         .then((response) => response.json())
                         .then((data) => {
                             if (data.success) {
-                                alert("Contract created successfully!");
-                                location.reload(); // Reload the page to refresh the contract list
+                                alert("Contract added successfully!");
+                                location.reload();
                             } else {
-                                alert(data.error || "An error occurred while creating the contract.");
+                                alert(data.error || "An error occurred while adding the contract.");
                             }
                         })
                         .catch((error) => {
-                            console.error("Error creating contract:", error);
                             alert("An unexpected error occurred. Please try again.");
+                            console.error("Error adding contract:", error);
                         });
                 });
 
 
+                // Handle Search Contract button
+                const searchContractButton = document.getElementById("search-contract-link");
+
+                if (searchContractButton) {
+                    searchContractButton.addEventListener("click", (event) => {
+                        event.preventDefault(); // Prevent default link behavior
+
+                        const contractNum = prompt("Enter the Contract Number to search:");
+
+                        if (contractNum && contractNum.trim() !== "") {
+                            fetch(`/api/contracts/search/${contractNum}`)
+                                .then((response) => {
+                                    if (!response.ok) {
+                                        throw new Error("Contract not found or an error occurred.");
+                                    }
+                                    return response.json();
+                                })
+                                .then((contractData) => {
+                                    const contractInfo = `
+                                        <h2>Contract Details</h2>
+                                        <p><strong>Contract Number:</strong> ${contractData.contract_num}</p>
+                                        <p><strong>Contract Text:</strong> ${contractData.contract_pdf || "No text provided"}</p>
+                                        <p><strong>Employee ID:</strong> ${contractData.employee_id}</p>
+                                        <p><strong>Customer ID:</strong> ${contractData.customer_id}</p>
+                                        <p><strong>Project Number:</strong> ${contractData.project_num}</p>
+                                        <p><strong>Date:</strong> ${contractData.date}</p>
+                                    `;
+
+                                    const popup = window.open("", "Contract Details", "width=400,height=400");
+                                    popup.document.write(`
+                                    <html>
+                                        <head>
+                                            <title>Contract Details</title>
+                                        </head>
+                                        <body>
+                                            ${contractInfo}
+                                            <button onclick="window.close()">Close</button>
+                                        </body>
+                                    </html>
+                                `);
+                                })
+                                .catch((error) => {
+                                    alert(error.message || "An error occurred while searching for the contract.");
+                                    console.error("Error fetching contract data:", error);
+                                });
+                        }
+                    });
+                }
+
+                // Handle edit contract button
+                const editContractButton = document.getElementById("edit-contract-link");
+
+                if (editContractButton) {
+                    editContractButton.addEventListener("click", (event) => {
+                        event.preventDefault(); // Prevent default link behavior
+
+                        const contractNum = prompt("Enter the Contract Number to edit:");
+
+                        if (contractNum && contractNum.trim() !== "") {
+                            fetch(`/api/contracts/search/${contractNum}`)
+                                .then((response) => {
+                                    if (!response.ok) {
+                                        throw new Error("Contract not found or an error occurred.");
+                                    }
+                                    return response.json();
+                                })
+                                .then((contractData) => {
+                                    document.getElementById("edit-contract-number").value = contractData.contract_num;
+                                    document.getElementById("edit-contract-text").value = contractData.contract_pdf || "";
+
+                                    document.getElementById("edit-contract-form-container").classList.remove("hidden");
+                                })
+                                .catch((error) => {
+                                    alert(error.message || "An error occurred while fetching the contract.");
+                                    console.error("Error fetching contract data:", error);
+                                });
+                        }
+                    });
+                }
+
+                // Handle form submission for editing the contract
+                document.getElementById("edit-contract-form").addEventListener("submit", (event) => {
+                    event.preventDefault(); // Prevent default form submission
+
+                    const contractNum = document.getElementById("edit-contract-number").value;
+                    const contractText = document.getElementById("edit-contract-text").value.trim();
+
+                    fetch(`/api/contracts/update/${contractNum}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ contract_pdf: contractText }),
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                alert("Contract updated successfully!");
+                                location.reload(); // Reload the page to refresh the data
+                            } else {
+                                alert(data.error || "An error occurred while updating the contract.");
+                            }
+                        })
+                        .catch((error) => {
+                            alert("An unexpected error occurred. Please try again.");
+                            console.error("Error updating contract:", error);
+                        });
+                });
 
             }
         });
@@ -1763,7 +2074,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
                 const tableBody = document.getElementById("profile-table-body");
-                // Populate the Profile table with employee data
                 const rows = `
                     <tr>
                         <th>Employee ID:</th>
@@ -1794,7 +2104,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <td>${employeeData.USERNAME}</td>
                     </tr>
                 `;
-                tableBody.innerHTML = rows; // Add rows to the table body
+                tableBody.innerHTML = rows;
             })
             .catch((error) => console.error("Error fetching employee data:", error));
     };
@@ -1806,10 +2116,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('edit-profile-btn').addEventListener('click', function () {
         const formContainer = document.getElementById('edit-profile-form-container');
 
-        // Toggle visibility of the form
         formContainer.classList.toggle('hidden');
 
-        // Fetch current profile data
         fetch('/api/employees/current')
             .then(response => response.json())
             .then(data => {
@@ -1818,11 +2126,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
-                // Populate form fields with current profile data
                 document.getElementById('fname').value = data.FNAME;
                 document.getElementById('lname').value = data.LNAME;
                 document.getElementById('username').value = data.USERNAME;
-                document.getElementById('password').value = ""; // Password shouldn't be prefilled for security reasons
+                document.getElementById('password').value = "";                 // security measure so no one can get password from front end
                 document.getElementById('phone').value = data.PHONE_NUMBER;
                 document.getElementById('email').value = data.EMAIL;
             })
@@ -1841,35 +2148,29 @@ document.addEventListener("DOMContentLoaded", () => {
         const phone = document.getElementById('phone').value.trim();
         const email = document.getElementById('email').value.trim();
 
-        // Validate fields (optional)
-        let isValid = true;
-
-        if (isValid) {
-            // Submit updated profile data
-            fetch('/api/employees/update', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    fname,
-                    lname,
-                    username,
-                    password,
-                    phone,
-                    email,
-                }),
+        fetch('/api/employees/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                fname,
+                lname,
+                username,
+                password,
+                phone,
+                email,
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Profile updated successfully!');
+                    location.reload(); // Reload the page to show changes
+                } else {
+                    alert(data.error || 'An error occurred.');
+                }
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Profile updated successfully!');
-                        location.reload(); // Reload the page to reflect changes
-                    } else {
-                        alert(data.error || 'An error occurred.');
-                    }
-                })
-                .catch(error => console.error('Error updating profile:', error));
-        }
+            .catch(error => console.error('Error updating profile:', error));
     });
 });

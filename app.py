@@ -1,35 +1,35 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_file
 import sqlite3
-import uuid  # For generating unique IDs
+import uuid
 import io
 import time
 from flask_cors import CORS
 
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
-app.secret_key = 'your_secret_key'  # Needed for flashing messages
+CORS(app)
+app.secret_key = 'your_secret_key'
 
-# Database connection helper
+
 def get_db_connection():
     conn = sqlite3.connect('CustomerDB.db')
-    conn.row_factory = sqlite3.Row  # Access rows like dictionaries
+    conn.row_factory = sqlite3.Row
     return conn
 
 
-# Home route
+
 @app.route('/')
 def home():
     return render_template('HomePage.html')
 
-# Customer login page
+
 @app.route('/customer_login', methods=['GET', 'POST'])
 def customer_login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
 
-        # Check username and password in the database
+
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM CUSTOMER WHERE USERNAME = ? AND PASSWORD = ?", (username, password))
@@ -37,34 +37,34 @@ def customer_login():
         conn.close()
 
         if customer:
-            # Redirect to the customer dashboard if credentials are correct
+
             return redirect(url_for('customer_main', customer_id=customer['CUSTOMER_ID']))
         else:
-            # Show an error if login fails
+
             flash("Invalid username or password.", 'error')
             return render_template('CustomerLogin.html')
 
     return render_template('CustomerLogin.html')
 
-# Customer dashboard page
+
 @app.route('/customer_main/<customer_id>')
 def customer_main(customer_id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Fetch customer details using customer_id
+
     cursor.execute("SELECT * FROM CUSTOMER WHERE CUSTOMER_ID = ?", (customer_id,))
     customer = cursor.fetchone()
     conn.close()
 
     if customer:
-        # Convert SQLite Row object to a dictionary
+
         customer_dict = dict(customer)
 
-        # Pass the actual password for the form and a masked password for the profile display
+
         customer_dict['MASKED_PASSWORD'] = '*' * len(customer_dict['PASSWORD'])
 
-        # Pass customer data to the template
+
         return render_template('CustomerMain.html', customer=customer_dict)
     else:
         flash("Customer not found.", 'error')
@@ -82,8 +82,8 @@ def customer_create():
         phone = request.form['phone']
         email = request.form['email']
 
-        # Generate a unique CUSTOMER_ID
-        customer_id = f"C{str(uuid.uuid4().int)[:8]}"  # Shorten UUID to 8 digits
+
+        customer_id = f"C{str(uuid.uuid4().int)[:8]}"
 
         conn = get_db_connection()
         try:
@@ -111,7 +111,7 @@ def customer_create():
 
 @app.route('/update_customer', methods=['POST'])
 def update_customer():
-    # Get form data
+
     customer_id = request.form['customer_id']
     name = request.form['name']
     username = request.form['username']
@@ -124,7 +124,7 @@ def update_customer():
     cursor = conn.cursor()
 
     try:
-        # Check for existing username or email (excluding current customer)
+
         cursor.execute("SELECT * FROM CUSTOMER WHERE USERNAME = ? AND CUSTOMER_ID != ?", (username, customer_id))
         if cursor.fetchone():
             flash('Username is already taken.', 'error')
@@ -139,7 +139,7 @@ def update_customer():
                     'PHONE_NUMBER': phone,
                     'EMAIL': email,
                 },
-                show_settings=True  # Pass a flag to keep the profile settings section visible
+                show_settings=True
             )
 
         cursor.execute("SELECT * FROM CUSTOMER WHERE EMAIL = ? AND CUSTOMER_ID != ?", (email, customer_id))
@@ -156,10 +156,10 @@ def update_customer():
                     'PHONE_NUMBER': phone,
                     'EMAIL': email,
                 },
-                show_settings=True  # Pass a flag to keep the profile settings section visible
+                show_settings=True
             )
 
-        # Update customer record
+
         cursor.execute("""
             UPDATE CUSTOMER SET NAME = ?, USERNAME = ?, PASSWORD = ?, ADDRESS = ?, PHONE_NUMBER = ?, EMAIL = ?
             WHERE CUSTOMER_ID = ?
@@ -176,7 +176,7 @@ def update_customer():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Fetch customer details using customer_id
+
     cursor.execute("SELECT * FROM CUSTOMER WHERE CUSTOMER_ID = ?", (customer_id,))
     customer = cursor.fetchone()
     conn.close()
@@ -185,7 +185,7 @@ def update_customer():
         customer_dict = dict(customer)
         customer_dict['MASKED_PASSWORD'] = '*' * len(customer_dict['PASSWORD'])
 
-        return render_template('CustomerMain.html', customer=customer_dict, show_settings=False)  # Default to profile view
+        return render_template('CustomerMain.html', customer=customer_dict, show_settings=False)
     else:
         flash("Customer not found.", 'error')
         return redirect(url_for('customer_login'))
@@ -196,7 +196,7 @@ def fetch_estimates(customer_id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Fetch all estimates for the logged-in customer
+
     cursor.execute(
         "SELECT * FROM ESTIMATE WHERE CUSTOMER_ID = ?",
         (customer_id,)
@@ -205,10 +205,10 @@ def fetch_estimates(customer_id):
 
     conn.close()
 
-    # Convert results to dictionaries
+
     all_estimates = [dict(row) for row in all_estimates]
 
-    # Return as JSON to the frontend
+
     return {"all_estimates": all_estimates}
 
 @app.route('/fetch_recent_estimate/<customer_id>', methods=['GET'])
@@ -216,7 +216,7 @@ def fetch_recent_estimate(customer_id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Fetch the most recently accepted estimate for the customer
+
     cursor.execute(
         """
         SELECT * FROM ESTIMATE
@@ -229,7 +229,7 @@ def fetch_recent_estimate(customer_id):
     recent_estimate = cursor.fetchone()
     conn.close()
 
-    # Return the recent estimate or an empty response if none exists
+
     if recent_estimate:
         return {"recent_estimate": dict(recent_estimate)}
     else:
@@ -240,11 +240,11 @@ def request_estimate():
     customer_id = request.form['customer_id']
     address = request.form['address']
 
-    # Example logic for inserting a new estimate
+
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        estimate_num = uuid.uuid4().int % 100000  # Generate a random estimate number
+        estimate_num = uuid.uuid4().int % 100000
         cursor.execute("""
             INSERT INTO ESTIMATE (ESTIMATE_NUM, ADDRESS, CUSTOMER_ID, PENDING_STATUS, REQUEST_DATE)
             VALUES (?, ?, ?, ?, DATE('now'))
@@ -285,13 +285,13 @@ def search_estimate():
 
 
 
-# Fetch all projects for a customer
+
 @app.route('/fetch_all_projects/<customer_id>', methods=['GET'])
 def fetch_all_projects(customer_id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Fetch all projects associated with the customer
+
     cursor.execute(
         """
         SELECT P.PROJECT_NUM, P.ADDRESS, P.START_TIME, P.ESTIMATE_LENGTH
@@ -304,10 +304,10 @@ def fetch_all_projects(customer_id):
     all_projects = cursor.fetchall()
     conn.close()
 
-    # Debug: Log the fetched projects
+
     print("Fetched Projects:", all_projects)
 
-    # Convert results to dictionaries
+
     all_projects = [dict(row) for row in all_projects]
 
     return {"all_projects": all_projects}
@@ -321,7 +321,7 @@ def search_project():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Fetch project with contract and certificate details
+
     cursor.execute(
         """
         SELECT 
@@ -330,10 +330,10 @@ def search_project():
             P.START_TIME AS START_DATE,
             P.ESTIMATE_LENGTH AS DURATION,
             SC.CONTRACT_NUM,
-            C.CONTRACT_PDF,  -- This is VARCHAR now
+            C.CONTRACT_PDF, 
             SC.DATE AS CONTRACT_DATE,
             SCC.CERTIFICATE_NUM,
-            CC.CERTIFICATE_PDF,  -- This is VARCHAR now
+            CC.CERTIFICATE_PDF,
             CC.DATE AS CERTIFICATE_DATE
         FROM PROJECT P
         LEFT JOIN SIGNS_CONTRACT SC ON P.PROJECT_NUM = SC.PROJECT_NUM
@@ -362,19 +362,19 @@ def employee_main(employee_id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Fetch employee details using employee_id
+
     cursor.execute("SELECT * FROM EMPLOYEE WHERE EMPLOYEE_ID = ?", (employee_id,))
     employee = cursor.fetchone()
     conn.close()
 
     if employee:
-        # Convert SQLite Row object to a dictionary
+
         employee_dict = dict(employee)
 
-        # Mask the password for display
+
         employee_dict['MASKED_PASSWORD'] = '*' * len(employee_dict['PASSWORD'])
 
-        # Pass employee data to the template
+
         return render_template('EmployeeMain.html', employee=employee_dict)
     else:
         flash("Employee not found.", 'error')
@@ -386,14 +386,14 @@ def employee_dashboard(employee_id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Fetch employee details
+
     cursor.execute("SELECT * FROM EMPLOYEE WHERE EMPLOYEE_ID = ?", (employee_id,))
     employee = cursor.fetchone()
     conn.close()
 
     if employee:
         employee_dict = dict(employee)
-        # Add MASKED_PASSWORD for display purposes
+
         employee_dict['MASKED_PASSWORD'] = '*' * len(employee_dict['PASSWORD'])
         return render_template('EmployeeMain.html', employee=employee_dict)
     else:
@@ -404,7 +404,7 @@ def employee_dashboard(employee_id):
 
 @app.route('/update_employee', methods=['POST'])
 def update_employee():
-    # Get form data
+
     employee_id = request.form['employee_id']
     fname = request.form['fname']
     lname = request.form['lname']
@@ -417,7 +417,7 @@ def update_employee():
     cursor = conn.cursor()
 
     try:
-        # Check for existing username or email (excluding the current employee)
+
         cursor.execute("SELECT * FROM EMPLOYEE WHERE USERNAME = ? AND EMPLOYEE_ID != ?", (username, employee_id))
         if cursor.fetchone():
             flash('Username is already taken.', 'error')
@@ -428,7 +428,7 @@ def update_employee():
             flash('Email is already taken.', 'error')
             return redirect(url_for('employee_main', employee_id=employee_id))
 
-        # Update employee record
+
         cursor.execute("""
             UPDATE EMPLOYEE
             SET FNAME = ?, LNAME = ?, USERNAME = ?, PASSWORD = ?, PHONE_NUMBER = ?, EMAIL = ?
@@ -463,7 +463,7 @@ def employee_login():
         conn.close()
 
         if employee:
-            # Store the logged-in employee's username in the session
+
             session['username'] = employee['USERNAME']
 
             if employee['IS_OWNER']:
@@ -483,7 +483,7 @@ def fetch_filtered_assigned_projects(employee_id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Query to fetch assigned projects excluding completed ones
+
     cursor.execute("""
         SELECT P.PROJECT_NUM, P.ADDRESS, P.START_TIME, P.ESTIMATE_LENGTH
         FROM WORKS_ON WO
@@ -496,13 +496,13 @@ def fetch_filtered_assigned_projects(employee_id):
     assigned_projects = cursor.fetchall()
     conn.close()
 
-    # Convert results to a list of dictionaries
+
     assigned_projects = [
         {
             "PROJECT_NUM": row[0],
             "ADDRESS": row[1],
             "START_TIME": row[2],
-            "ESTIMATE_LENGTH": str(row[3])  # Ensure time is string formatted
+            "ESTIMATE_LENGTH": str(row[3])
         }
         for row in assigned_projects
     ]
@@ -514,7 +514,7 @@ def fetch_all_projects_history(employee_id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Query to fetch all projects for the employee
+
     cursor.execute("""
         SELECT P.PROJECT_NUM, P.START_TIME,
                CASE WHEN P.PROJECT_NUM IN (
@@ -527,7 +527,7 @@ def fetch_all_projects_history(employee_id):
     all_projects = cursor.fetchall()
     conn.close()
 
-    # Convert results to a list of dictionaries
+
     all_projects = [
         {
             "PROJECT_NUM": row[0],
@@ -549,7 +549,7 @@ def search_project_employee(employee_id):
     cursor = conn.cursor()
 
     try:
-        # Validate if the employee works on the project
+
         cursor.execute("""
             SELECT P.PROJECT_NUM, P.ADDRESS, P.START_TIME, P.ESTIMATE_LENGTH
             FROM WORKS_ON WO
@@ -561,7 +561,7 @@ def search_project_employee(employee_id):
         if not project:
             return {"success": False, "message": "You are not assigned to this project or it does not exist."}
 
-        # Fetch orders associated with the project
+
         cursor.execute("""
             SELECT O.ORDER_NUM, O.STORE_NAME, O.COMPLETION_STAT
             FROM ORDERS O
@@ -569,15 +569,15 @@ def search_project_employee(employee_id):
         """, (project_number,))
         orders = cursor.fetchall()
 
-        # Format the project details
+
         project_data = {
             "PROJECT_NUM": project[0],
             "ADDRESS": project[1],
             "START_TIME": project[2],
-            "ESTIMATE_LENGTH": str(project[3]),  # Ensure time is string formatted
+            "ESTIMATE_LENGTH": str(project[3]),
         }
 
-        # Format the orders
+
         order_data = [
             {
                 "ORDER_NUM": order[0],
@@ -601,7 +601,7 @@ def confirm_order(project_number):
     cursor = conn.cursor()
 
     try:
-        # Update the COMPLETION_STAT of the orders for the project
+
         cursor.execute("""
             UPDATE ORDERS
             SET COMPLETION_STAT = 1
@@ -624,7 +624,7 @@ def confirm_specific_order():
     cursor = conn.cursor()
 
     try:
-        # Validate if the order belongs to the project
+
         cursor.execute("""
             SELECT 1
             FROM ORDERS
@@ -635,7 +635,7 @@ def confirm_specific_order():
         if not order:
             return {"success": False, "message": "The specified order does not belong to this project."}
 
-        # Update the COMPLETION_STAT of the order
+
         cursor.execute("""
             UPDATE ORDERS
             SET COMPLETION_STAT = 1
@@ -665,7 +665,7 @@ def add_material(employee_id):
     cursor = conn.cursor()
 
     try:
-        # Validate that the order exists and the employee is authorized to add materials
+
         cursor.execute("""
             SELECT 1
             FROM WORKS_ON WO
@@ -678,10 +678,10 @@ def add_material(employee_id):
         if not authorized:
             return jsonify({"success": False, "message": "You are not authorized to add materials to this order."})
 
-        # Generate a unique Material ID
+
         material_id = f"MAT-{int(time.time() * 1000)}"
 
-        # Insert the material into the MATERIALS table
+
         cursor.execute("""
             INSERT INTO MATERIALS (MATERIAL_ID, NAME, TYPE, COST, AMOUNT, ORDER_NUM)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -706,7 +706,7 @@ def view_materials(employee_id):
     cursor = conn.cursor()
 
     try:
-        # Validate that the employee is authorized to view materials for this order
+
         cursor.execute("""
             SELECT 1
             FROM WORKS_ON WO
@@ -719,7 +719,7 @@ def view_materials(employee_id):
         if not authorized:
             return jsonify({"success": False, "message": "You are not authorized to view materials for this order."})
 
-        # Fetch materials for the order
+
         cursor.execute("""
             SELECT MATERIAL_ID, NAME, TYPE, COST, AMOUNT
             FROM MATERIALS
@@ -774,7 +774,7 @@ def emp_delete_employee():
             flash('Account successfully deleted.', 'success')
 
         conn.close()
-        return redirect(url_for('home'))  # Redirect to home after deletion
+        return redirect(url_for('home'))
     except Exception as e:
         conn.close()
         flash(f"An error occurred: {e}", 'error')
@@ -801,7 +801,7 @@ def cust_delete_customer():
             flash('Account successfully deleted.', 'success')
 
         conn.close()
-        return redirect(url_for('home'))  # Redirect to home after deletion
+        return redirect(url_for('home'))
     except Exception as e:
         conn.close()
         flash(f"An error occurred: {e}", 'error')
@@ -823,19 +823,15 @@ def cust_delete_customer():
 
 
 
-
-# Function to get all employees to store in manager's employee list
 @app.route('/api/employees', methods=['GET'])
 def owner_get_employees():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Fetch all employees
     cursor.execute("SELECT EMPLOYEE_ID, FNAME, LNAME, PHONE_NUMBER, EMAIL, START_DATE FROM EMPLOYEE")
     employees = cursor.fetchall()
     conn.close()
 
-    # Convert rows to JSON-compatible dictionaries
     employee_list = [
         {
             'id': row['EMPLOYEE_ID'],
@@ -850,11 +846,30 @@ def owner_get_employees():
 
     return {'employees': employee_list}
 
+# Function to get all tuples from works_on table
+@app.route('/api/works_on', methods=['GET'])
+def owner_get_works_on():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT EMPLOYEE_ID, PROJECT_NUM FROM WORKS_ON")
+    works_on = cursor.fetchall()
+    conn.close()
+
+    works_on_list = [
+        {
+            'employee_id': row['EMPLOYEE_ID'],
+            'project_num': row['PROJECT_NUM'],
+        }
+        for row in works_on
+    ]
+
+    return {'works_on': works_on_list}
 
 @app.route('/api/employees/current', methods=['GET'])
 def owner_get_current_employee():
-    # Fetch the username from the session
-    current_username = session.get('username')  # Retrieve the logged-in username
+
+    current_username = session.get('username')
 
     if not current_username:
         return {"error": "No logged-in employee"}, 401
@@ -871,7 +886,6 @@ def owner_get_current_employee():
     conn.close()
 
     if employee:
-        # Convert row to a dictionary and return as JSON
         return {
             "EMPLOYEE_ID": employee["EMPLOYEE_ID"],
             "FNAME": employee["FNAME"],
@@ -879,35 +893,11 @@ def owner_get_current_employee():
             "PHONE_NUMBER": employee["PHONE_NUMBER"],
             "EMAIL": employee["EMAIL"],
             "START_DATE": employee["START_DATE"],
-            "USERNAME": employee["USERNAME"],  # Include the USERNAME field
+            "USERNAME": employee["USERNAME"],
         }
     else:
         return {"error": "Employee not found"}, 404
 
-
-
-    # Convert rows to JSON-compatible dictionaries
-    estimate_list = []
-    for row in estimates:
-        estimate = {
-            'estimate_num': row['ESTIMATE_NUM'],
-            'address': row['ADDRESS'],
-            'project_cost': row['PROJECT_COST'],
-            'gst': row['GST'],
-            'total': row['TOTAL'],
-            'employee_id': row['EMPLOYEE_ID'],
-            'customer_id': row['CUSTOMER_ID'],
-        }
-
-        # Handle the PDF field (convert binary to Base64 or skip if None)
-        if row['ESTIMATE_PDF']:
-            estimate['estimate_pdf'] = row['ESTIMATE_PDF'].hex()  # Convert to a hex string
-        else:
-            estimate['estimate_pdf'] = None
-
-        estimate_list.append(estimate)
-
-    return jsonify({'estimates': estimate_list})
 
 # Update functions for Owner to update profile
 @app.route('/api/employees/update', methods=['POST'])
@@ -923,7 +913,6 @@ def Owner_update_profile():
     phone = data.get('phone', '').strip()
     email = data.get('email', '').strip()
 
-    # Fetch the logged-in username from the session
     current_username = session.get('username')
 
     if not current_username:
@@ -966,7 +955,6 @@ def owner_get_projects():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Fetch all projects
     cursor.execute("""
         SELECT PROJECT_NUM, ESTIMATE_LENGTH, START_TIME, ADDRESS
         FROM PROJECT
@@ -974,7 +962,6 @@ def owner_get_projects():
     projects = cursor.fetchall()
     conn.close()
 
-    # Convert rows to JSON-compatible dictionaries
     project_list = [
         {
             'project_num': row['PROJECT_NUM'],
@@ -992,7 +979,6 @@ def Owner_get_orders():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Fetch all orders
     cursor.execute("""
         SELECT ORDER_NUM, STORE_NAME, COMPLETION_STAT, PROJECT_NUM
         FROM ORDERS
@@ -1000,7 +986,6 @@ def Owner_get_orders():
     orders = cursor.fetchall()
     conn.close()
 
-    # Convert rows to JSON-compatible dictionaries
     order_list = [
         {
             'order_num': row['ORDER_NUM'],
@@ -1017,7 +1002,6 @@ def Owner_get_orders():
 @app.route('/api/certificates', methods=['GET'])
 def Owner_get_certificates():
     try:
-        # Connect to the database
         conn = get_db_connection()
         certificates = conn.execute("""
             SELECT CERTIFICATE_NUM, CERTIFICATE_PDF, DATE, CUSTOMER_ID, PROJECT_NUM
@@ -1026,13 +1010,12 @@ def Owner_get_certificates():
         conn.close()
 
         if not certificates:
-            return jsonify({"certificates": []}), 200  # Return empty list if no certificates found
+            return jsonify({"certificates": []}), 200
 
-        # Convert SQLite rows to dictionaries
         certificate_list = [
             {
                 "certificate_num": row["CERTIFICATE_NUM"],
-                "certificate_pdf": None if row["CERTIFICATE_PDF"] is None else "PDF Available",
+                "certificate_pdf": row["CERTIFICATE_PDF"],
                 "date": row["DATE"],
                 "customer_id": row["CUSTOMER_ID"],
                 "project_num": row["PROJECT_NUM"],
@@ -1053,7 +1036,6 @@ def Owner_get_contracts():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Fetch all contracts
     cursor.execute("""
         SELECT CONTRACT_NUM, EMPLOYEE_ID, CUSTOMER_ID, CONTRACT_PDF
         FROM CONTRACT
@@ -1061,7 +1043,6 @@ def Owner_get_contracts():
     contracts = cursor.fetchall()
     conn.close()
 
-    # Convert rows to JSON-compatible dictionaries
     contract_list = [
         {
             'contract_num': row['CONTRACT_NUM'],
@@ -1081,14 +1062,12 @@ def Owner_get_materials():
     cursor = conn.cursor()
 
     try:
-        # Fetch all materials
         cursor.execute("""
             SELECT MATERIAL_ID, NAME, TYPE, COST, AMOUNT, ORDER_NUM
             FROM MATERIALS
         """)
         materials = cursor.fetchall()
 
-        # Convert rows to JSON-compatible dictionaries
         materials_list = [
             {
                 'material_id': row['MATERIAL_ID'],
@@ -1114,7 +1093,6 @@ def Owner_delete_employee(employee_id):
     cursor = conn.cursor()
 
     try:
-        # Delete the employee with the given Employee_ID
         cursor.execute("DELETE FROM EMPLOYEE WHERE EMPLOYEE_ID = ?", (employee_id,))
         conn.commit()
 
@@ -1134,14 +1112,12 @@ def Owner_delete_estimate(estimate_num):
     cursor = conn.cursor()
 
     try:
-        # Check if the estimate exists
         cursor.execute("SELECT * FROM ESTIMATE WHERE ESTIMATE_NUM = ?", (estimate_num,))
         estimate = cursor.fetchone()
 
         if not estimate:
             return {'error': 'Estimate not found'}, 404
 
-        # Delete the estimate
         cursor.execute("DELETE FROM ESTIMATE WHERE ESTIMATE_NUM = ?", (estimate_num,))
         conn.commit()
 
@@ -1159,14 +1135,12 @@ def Onwer_delete_project(project_num):
     cursor = conn.cursor()
 
     try:
-        # Check if the project exists
         cursor.execute("SELECT * FROM PROJECT WHERE PROJECT_NUM = ?", (project_num,))
         project = cursor.fetchone()
 
         if not project:
             return {'error': 'Project not found'}, 404
 
-        # Delete the project
         cursor.execute("DELETE FROM PROJECT WHERE PROJECT_NUM = ?", (project_num,))
         conn.commit()
 
@@ -1183,15 +1157,16 @@ def Owner_delete_certificate(certificate_num):
     cursor = conn.cursor()
 
     try:
-        # Check if the certificate exists
         cursor.execute("SELECT * FROM COMPLETION_CERTIFICATE WHERE CERTIFICATE_NUM = ?", (certificate_num,))
         certificate = cursor.fetchone()
 
         if not certificate:
             return {'error': 'Certificate not found'}, 404
 
-        # Delete the certificate
         cursor.execute("DELETE FROM COMPLETION_CERTIFICATE WHERE CERTIFICATE_NUM = ?", (certificate_num,))
+        conn.commit()
+
+        cursor.execute("DELETE FROM SIGNS_CERTIFICATE WHERE CERTIFICATE_NUM = ?", (certificate_num,))
         conn.commit()
 
         return {'success': True}
@@ -1207,14 +1182,12 @@ def Owner_delete_order(order_num):
     cursor = conn.cursor()
 
     try:
-        # Check if the order exists
         cursor.execute("SELECT * FROM ORDERS WHERE ORDER_NUM = ?", (order_num,))
         order = cursor.fetchone()
 
         if not order:
             return {'error': 'Order not found'}, 404
 
-        # Delete the order
         cursor.execute("DELETE FROM ORDERS WHERE ORDER_NUM = ?", (order_num,))
         conn.commit()
 
@@ -1231,15 +1204,16 @@ def Owner_delete_contract(contract_num):
     cursor = conn.cursor()
 
     try:
-        # Check if the contract exists
         cursor.execute("SELECT * FROM CONTRACT WHERE CONTRACT_NUM = ?", (contract_num,))
         contract = cursor.fetchone()
 
         if not contract:
             return {'error': 'Contract not found'}, 404
 
-        # Delete the contract
         cursor.execute("DELETE FROM CONTRACT WHERE CONTRACT_NUM = ?", (contract_num,))
+        conn.commit()
+
+        cursor.execute("DELETE FROM SIGNS_CONTRACT WHERE CONTRACT_NUM = ?", (contract_num,))
         conn.commit()
 
         return {'success': True}
@@ -1255,14 +1229,12 @@ def Owner_delete_material(material_id):
     cursor = conn.cursor()
 
     try:
-        # Check if the material exists
         cursor.execute("SELECT * FROM MATERIALS WHERE MATERIAL_ID = ?", (material_id,))
         material = cursor.fetchone()
 
         if not material:
             return {'error': 'Material not found'}, 404
 
-        # Delete the material
         cursor.execute("DELETE FROM MATERIALS WHERE MATERIAL_ID = ?", (material_id,))
         conn.commit()
 
@@ -1288,8 +1260,7 @@ def Owner_create_employee():
     email = data.get('email', '').strip()
     start_date = data.get('start_date', '').strip()
 
-    # Generate a unique EMPLOYEE_ID
-    employee_id = f"E{str(uuid.uuid4().int)[:8]}"  # Short UUID-like ID (E + 8 digits)
+    employee_id = f"E{str(uuid.uuid4().int)[:8]}"
 
     # Validation checks
     if len(username) < 7:
@@ -1305,7 +1276,6 @@ def Owner_create_employee():
     cursor = conn.cursor()
 
     try:
-        # Insert the new employee into the database
         cursor.execute(
             """
             INSERT INTO EMPLOYEE (EMPLOYEE_ID, FNAME, LNAME, USERNAME, PASSWORD, PHONE_NUMBER, EMAIL, START_DATE)
@@ -1333,13 +1303,11 @@ def Owner_create_project():
     if not data:
         return {'error': 'Invalid JSON payload'}, 400
 
-    # Extract project details
-    project_num = f"{str(uuid.uuid4().int)[:8]}"  # Generate unique Project ID
+    project_num = f"{str(uuid.uuid4().int)[:8]}"
     estimate_length = data.get('estimate_length', '').strip()
     start_time = data.get('start_time', '').strip()
     address = data.get('address', '').strip()
 
-    # Validation checks
     if not estimate_length or not start_time or not address:
         return {'error': 'All fields are required (Estimate Length, Start Time, Address).'}, 400
 
@@ -1347,7 +1315,6 @@ def Owner_create_project():
     cursor = conn.cursor()
 
     try:
-        # Insert the new project into the database
         cursor.execute(
             """
             INSERT INTO PROJECT (PROJECT_NUM, ESTIMATE_LENGTH, START_TIME, ADDRESS)
@@ -1372,23 +1339,19 @@ def Owner_create_certificate():
         if not data:
             return {'error': 'Invalid JSON payload'}, 400
 
-        # Extract certificate details
-        certificate_text = data.get('certificate_text', '').strip()  # New field for certificate text
+        certificate_pdf = data.get('certificate_pdf', '').strip()
         date = data.get('date', '').strip()
         customer_id = data.get('customer_id', '').strip()
-        project_num = data.get('project_num', '').strip() or None  # Allow project_num to be None
+        project_num = data.get('project_num', '').strip() or None
 
-        # Generate a unique Certificate ID
-        certificate_num = int(uuid.uuid4().int % 1e8)  # Generate an 8-digit unique integer
+        certificate_num = int(uuid.uuid4().int % 1e8)
 
-        # Validation
-        if not certificate_text or not date or not customer_id:
-            return {'error': 'Certificate Text, Date, and Customer ID are required.'}, 400
+        if not date or not customer_id:
+            return {'error': 'Date, and Customer ID are required.'}, 400
 
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Check if the customer ID exists
         customer_check = cursor.execute(
             "SELECT 1 FROM CUSTOMER WHERE CUSTOMER_ID = ?",
             (customer_id,)
@@ -1396,7 +1359,6 @@ def Owner_create_certificate():
         if not customer_check:
             return {'error': f'Customer ID {customer_id} does not exist.'}, 404
 
-        # Check if the project number exists if provided
         if project_num:
             project_check = cursor.execute(
                 "SELECT 1 FROM PROJECT WHERE PROJECT_NUM = ?",
@@ -1405,16 +1367,14 @@ def Owner_create_certificate():
             if not project_check:
                 return {'error': f'Project Number {project_num} does not exist.'}, 404
 
-        # Insert the new certificate into the COMPLETION_CERTIFICATE table
         cursor.execute(
             """
             INSERT INTO COMPLETION_CERTIFICATE (CERTIFICATE_NUM, CERTIFICATE_PDF, DATE, CUSTOMER_ID, PROJECT_NUM)
             VALUES (?, ?, ?, ?, ?)
             """,
-            (certificate_num, certificate_text, date, customer_id, project_num)
+            (certificate_num, certificate_pdf, date, customer_id, project_num)
         )
 
-        # Insert the corresponding entry into the SIGNS_CERTIFICATE table
         cursor.execute(
             """
             INSERT INTO SIGNS_CERTIFICATE (CERTIFICATE_NUM, EMPLOYEE_ID, CUSTOMER_ID, PROJECT_NUM)
@@ -1430,75 +1390,6 @@ def Owner_create_certificate():
         return {'error': f'Database error: {str(e)}'}, 500
     finally:
         conn.close()
-
-# Create order function
-
-
-# Add contract Function
-@app.route('/api/contracts/create', methods=['POST'])
-def Owner_create_contract():
-    try:
-        # Get data from the request
-        data = request.get_json()
-        contract_pdf = data.get("contract_pdf")  # PDF data as a string or NULL
-        employee_id = data.get("employee_id")
-        customer_id = data.get("customer_id")
-        project_num = data.get("project_num")
-        contract_date = data.get("date")  # Date field for SIGNS_CONTRACT
-
-        # Generate a unique CONTRACT_NUM
-        contract_num = f"C{str(uuid.uuid4().int)[:8]}"
-
-        # Validate required fields
-        if not employee_id or not customer_id or not project_num or not contract_date:
-            return jsonify({"error": "Employee ID, Customer ID, Project Number, and Date are required."}), 400
-
-        # Connect to the database
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        # Check if the employee ID exists
-        cursor.execute("SELECT 1 FROM EMPLOYEE WHERE EMPLOYEE_ID = ?", (employee_id,))
-        if not cursor.fetchone():
-            return jsonify({"error": "Employee ID does not exist."}), 404
-
-        # Check if the customer ID exists
-        cursor.execute("SELECT 1 FROM CUSTOMER WHERE CUSTOMER_ID = ?", (customer_id,))
-        if not cursor.fetchone():
-            return jsonify({"error": "Customer ID does not exist."}), 404
-
-        # Check if the project number exists
-        cursor.execute("SELECT 1 FROM PROJECT WHERE PROJECT_NUM = ?", (project_num,))
-        if not cursor.fetchone():
-            return jsonify({"error": "Project Number does not exist."}), 404
-
-        # Insert the new contract into the CONTRACT table
-        cursor.execute(
-            """
-            INSERT INTO CONTRACT (CONTRACT_NUM, CONTRACT_PDF, EMPLOYEE_ID, CUSTOMER_ID)
-            VALUES (?, ?, ?, ?)
-            """,
-            (contract_num, contract_pdf, employee_id, customer_id)
-        )
-
-        # Insert the corresponding entry into the SIGNS_CONTRACT table
-        cursor.execute(
-            """
-            INSERT INTO SIGNS_CONTRACT (EMPLOYEE_ID, CUSTOMER_ID, CONTRACT_NUM, PROJECT_NUM, DATE)
-            VALUES (?, ?, ?, ?, ?)
-            """,
-            (employee_id, customer_id, contract_num, project_num, contract_date)
-        )
-
-        conn.commit()
-        conn.close()
-
-        return jsonify({"success": True, "message": "Contract and signing record created successfully.", "contract_num": contract_num}), 201
-
-    except sqlite3.Error as e:
-        return jsonify({"error": "Database error occurred.", "details": str(e)}), 500
-    except Exception as e:
-        return jsonify({"error": "An unexpected error occurred.", "details": str(e)}), 500
 
 
 # Search employee function
@@ -1568,7 +1459,6 @@ def Owner_get_all_estimates():
 @app.route('/api/estimates/download/<int:estimate_num>', methods=['GET'])
 def Owner_download_estimate_pdf(estimate_num):
     try:
-        # Connect to the database
         conn = get_db_connection()
         estimate = conn.execute(
             "SELECT ESTIMATE_PDF FROM ESTIMATE WHERE ESTIMATE_NUM = ?",
@@ -1650,11 +1540,9 @@ def Owner_update_estimate(estimate_num):
         customer_id = data.get("customer_id", "").strip()
         pending_status = data.get("pending_status", "True").lower() == "true"
 
-        # Validation
         if not address or not project_cost or not employee_id or not customer_id:
             return jsonify({"error": "All fields are required."}), 400
 
-        # Try parsing the project cost
         try:
             project_cost = float(project_cost)
             gst = project_cost * 0.05
@@ -1662,7 +1550,6 @@ def Owner_update_estimate(estimate_num):
         except ValueError:
             return jsonify({"error": "Invalid project cost format."}), 400
 
-        # Update the estimate
         cursor.execute(
             """
             UPDATE ESTIMATE
@@ -1685,14 +1572,11 @@ def Owner_update_estimate(estimate_num):
 @app.route('/api/projects/<project_num>', methods=['GET'])
 def get_project_by_num(project_num):
     try:
-        # Strip non-numeric characters (if needed)
         if not project_num.isdigit():
             project_num = ''.join(filter(str.isdigit, project_num))
 
-        # Convert to an integer
         project_num = int(project_num)
 
-        # Query the database
         conn = get_db_connection()
         project = conn.execute(
             "SELECT * FROM PROJECT WHERE PROJECT_NUM = ?",
@@ -1713,7 +1597,6 @@ def get_project_by_num(project_num):
             return jsonify({"error": "Project not found"}), 404
 
     except ValueError:
-        # Handle invalid input (non-numeric)
         return jsonify({"error": "Invalid project number format"}), 400
     except sqlite3.Error as e:
         return jsonify({"error": "Database error occurred.", "details": str(e)}), 500
@@ -1724,18 +1607,15 @@ def get_project_by_num(project_num):
 @app.route('/api/projects/update/<int:project_num>', methods=['POST'])
 def Owner_update_project(project_num):
     try:
-        # Parse form data
         data = request.form
         estimate_length = data.get('estimate_length')
         start_time = data.get('start_time')
         address = data.get('address')
         employee_id = data.get('employee_id')
 
-        # Validate required field
         if not estimate_length or not start_time or not address:
             return jsonify({"error": "All fields (Estimate Length, Start Time, Address) are required."}), 400
 
-        # Update the project in the database
         conn = get_db_connection()
         conn.execute(
             """
@@ -1755,150 +1635,51 @@ def Owner_update_project(project_num):
     except Exception as e:
         return jsonify({"error": "An unexpected error occurred.", "details": str(e)}), 500
 
-#Search Certificate Function
-@app.route('/api/certificates/search/<int:certificate_num>', methods=['GET'])
-def Owner_search_certificate(certificate_num):
+# Function to search orders
+@app.route('/api/orders/search/<int:order_num>', methods=['GET'])
+def search_order(order_num):
     try:
-        # Connect to the database
-        conn = get_db_connection()
-        certificate = conn.execute(
-            """
-            SELECT CERTIFICATE_NUM, CERTIFICATE_PDF, DATE, CUSTOMER_ID, PROJECT_NUM
-            FROM COMPLETION_CERTIFICATE
-            WHERE CERTIFICATE_NUM = ?
-            """,
-            (certificate_num,)
-        ).fetchone()
-        conn.close()
-
-        if certificate:
-            # Check if the PDF exists and generate the download URL if available
-            pdf_url = f"/api/certificates/download/{certificate['CERTIFICATE_NUM']}" if certificate["CERTIFICATE_PDF"] else None
-
-            certificate_dict = {
-                "certificate_num": certificate["CERTIFICATE_NUM"],
-                "pdf_url": pdf_url,
-                "date": certificate["DATE"],
-                "customer_id": certificate["CUSTOMER_ID"],
-                "project_num": certificate["PROJECT_NUM"],
-            }
-            return jsonify(certificate_dict), 200
-        else:
-            return jsonify({"error": "Certificate not found"}), 404
-
-    except sqlite3.Error as e:
-        return jsonify({"error": "Database error occurred.", "details": str(e)}), 500
-    except Exception as e:
-        return jsonify({"error": "An unexpected error occurred.", "details": str(e)}), 500
-
-# Function for updating certificate
-@app.route('/api/certificates/update/<int:certificate_num>', methods=['POST'])
-def Owner_update_certificate(certificate_num):
-    try:
-        # Connect to the database
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Check if the certificate exists
-        cursor.execute("SELECT * FROM COMPLETION_CERTIFICATE WHERE CERTIFICATE_NUM = ?", (certificate_num,))
-        certificate = cursor.fetchone()
+        cursor.execute("SELECT * FROM ORDERS WHERE ORDER_NUM = ?", (order_num,))
+        order = cursor.fetchone()
 
-        if not certificate:
-            return jsonify({"error": "Certificate not found"}), 404
-
-        # Parse the incoming form data
-        data = request.form
-        certificate_text = data.get("certificate_text", "").strip()  # New field for text
-        date = data.get("date", "").strip()
-        customer_id = data.get("customer_id", "").strip()
-        project_num = data.get("project_num", "").strip() or None
-
-        # Validate input fields
-        if not certificate_text or not date or not customer_id:
-            return jsonify({"error": "Certificate Text, Date, and Customer ID are required"}), 400
-
-        # Check if the customer ID exists
-        cursor.execute("SELECT 1 FROM CUSTOMER WHERE CUSTOMER_ID = ?", (customer_id,))
-        if not cursor.fetchone():
-            return jsonify({"error": "Customer ID does not exist"}), 400
-
-        # Check if the project number exists if provided
-        if project_num:
-            cursor.execute("SELECT 1 FROM PROJECT WHERE PROJECT_NUM = ?", (project_num,))
-            if not cursor.fetchone():
-                return jsonify({"error": "Project Number does not exist"}), 400
-
-        # Update the certificate in the database
-        cursor.execute(
-            """
-            UPDATE COMPLETION_CERTIFICATE
-            SET CERTIFICATE_PDF = ?, DATE = ?, CUSTOMER_ID = ?, PROJECT_NUM = ?
-            WHERE CERTIFICATE_NUM = ?
-            """,
-            (certificate_text, date, customer_id, project_num, certificate_num)
-        )
-
-        conn.commit()
-        return jsonify({"success": True, "message": "Certificate updated successfully"}), 200
-
-    except sqlite3.Error as e:
-        return jsonify({"error": f"Database error occurred: {str(e)}"}), 500
-    finally:
-        conn.close()
-
-# Function to search orders
-@app.route('/api/orders/search/<int:order_num>', methods=['GET'])
-def Owner_search_order(order_num):
-    try:
-        # Connect to the database
-        conn = get_db_connection()
-        order = conn.execute(
-            "SELECT * FROM ORDERS WHERE ORDER_NUM = ?",
-            (order_num,)
-        ).fetchone()
         conn.close()
 
         if order:
-            # Convert the SQLite row to a dictionary
-            order_dict = {
+            order_data = {
                 "order_num": order["ORDER_NUM"],
                 "store_name": order["STORE_NAME"],
                 "completion_stat": "Completed" if order["COMPLETION_STAT"] else "Pending",
-                "project_num": order["PROJECT_NUM"],
+                "project_num": order["PROJECT_NUM"]
             }
-            return jsonify(order_dict), 200
+            return jsonify(order_data), 200
         else:
             return jsonify({"error": "Order not found"}), 404
 
     except sqlite3.Error as e:
-        return jsonify({"error": "Database error occurred.", "details": str(e)}), 500
-    except Exception as e:
-        return jsonify({"error": "An unexpected error occurred.", "details": str(e)}), 500
+        return jsonify({"error": f"Database error occurred: {str(e)}"}), 500
 
 # Update order completion status function
 @app.route('/api/orders/update_status/<int:order_num>', methods=['POST'])
 def Owner_update_order_status(order_num):
     try:
-        # Connect to the database
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Check if the order exists
         cursor.execute("SELECT * FROM ORDERS WHERE ORDER_NUM = ?", (order_num,))
         order = cursor.fetchone()
 
         if not order:
             return jsonify({"error": "Order not found"}), 404
 
-        # Parse the incoming form data
         data = request.form
         completion_stat = data.get("completion_stat", "").strip()
 
-        # Validate completion status
         if completion_stat not in ["0", "1"]:
             return jsonify({"error": "Invalid completion status. Must be 0 (Pending) or 1 (Completed)."}), 400
 
-        # Update the completion status in the database
         cursor.execute(
             """
             UPDATE ORDERS
@@ -1919,12 +1700,438 @@ def Owner_update_order_status(order_num):
         conn.close()
 
 
-# Function for creating contract
+# Function for searching certificate
+@app.route('/api/certificates/<int:certificate_num>', methods=['GET'])
+def Owner_search_certificate(certificate_num):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "SELECT CERTIFICATE_NUM, CERTIFICATE_PDF, DATE, CUSTOMER_ID, PROJECT_NUM "
+            "FROM COMPLETION_CERTIFICATE WHERE CERTIFICATE_NUM = ?",
+            (certificate_num,)
+        )
+        certificate = cursor.fetchone()
+        conn.close()
+
+        if certificate:
+            certificate_data = {
+                "certificate_num": certificate["CERTIFICATE_NUM"],
+                "certificate_pdf": certificate["CERTIFICATE_PDF"],
+                "date": certificate["DATE"],
+                "customer_id": certificate["CUSTOMER_ID"],
+                "project_num": certificate["PROJECT_NUM"]
+            }
+            return jsonify(certificate_data), 200
+        else:
+            return jsonify({"error": "Certificate not found"}), 404
+
+    except sqlite3.Error as e:
+        return jsonify({"error": "Database error occurred.", "details": str(e)}), 500
+    except Exception as e:
+        return jsonify({"error": "An unexpected error occurred.", "details": str(e)}), 500
 
 
+# Update certificate function
+@app.route('/api/certificates/update/<int:certificate_num>', methods=['POST'])
+def Owner_update_certificate(certificate_num):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
+        cursor.execute("SELECT * FROM COMPLETION_CERTIFICATE WHERE CERTIFICATE_NUM = ?", (certificate_num,))
+        certificate = cursor.fetchone()
+
+        if not certificate:
+            return jsonify({"error": "Certificate not found"}), 404
+
+        certificate_text = request.form.get("certificate_text", "").strip()
+        date = request.form.get("date", "").strip()
+
+        cursor.execute(
+            """
+            UPDATE COMPLETION_CERTIFICATE
+            SET CERTIFICATE_PDF = ?, DATE = ?
+            WHERE CERTIFICATE_NUM = ?
+            """,
+            (certificate_text, date, certificate_num)
+        )
+        conn.commit()
+
+        return jsonify({"success": True, "message": "Certificate updated successfully"}), 200
+
+    except sqlite3.Error as e:
+        return jsonify({"error": f"Database error occurred: {str(e)}"}), 500
+    finally:
+        conn.close()
+
+
+# Add order function
+@app.route('/api/orders/create', methods=['POST'])
+def Owner_add_order():
+    try:
+        store_name = request.form.get("store_name", "").strip()
+        project_num = request.form.get("project_num", "").strip()
+        completion_stat = request.form.get("completion_stat", "0").strip()
+
+        if not store_name or not project_num:
+            return jsonify({"error": "Store Name and Project Number are required."}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT 1 FROM PROJECT WHERE PROJECT_NUM = ?", (project_num,))
+        project = cursor.fetchone()
+        if not project:
+            return jsonify({"error": f"Project Number {project_num} does not exist."}), 404
+
+        order_num = int(uuid.uuid4().int % 1e8)
+
+        cursor.execute(
+            """
+            INSERT INTO ORDERS (ORDER_NUM, STORE_NAME, COMPLETION_STAT, PROJECT_NUM)
+            VALUES (?, ?, ?, ?)
+            """,
+            (order_num, store_name, int(completion_stat), project_num)
+        )
+        conn.commit()
+
+        return jsonify({"success": True, "message": "Order added successfully", "order_num": order_num}), 201
+
+    except sqlite3.Error as e:
+        return jsonify({"error": f"Database error occurred: {str(e)}"}), 500
+    finally:
+        conn.close()
+
+# fucntion to crete contract
+@app.route('/api/contracts/create', methods=['POST'])
+def Owner_create_contract():
+    try:
+        # Parse the form data
+        contract_pdf = request.form.get("contract_pdf", "").strip()
+        employee_id = request.form.get("employee_id", "").strip()
+        customer_id = request.form.get("customer_id", "").strip()
+        project_num = request.form.get("project_num", "").strip()
+        contract_date = request.form.get("date", "").strip()
+
+        if not contract_pdf or not employee_id or not customer_id or not project_num or not contract_date:
+            return jsonify({"error": "All fields are required."}), 400
+
+        contract_num = f"C{str(uuid.uuid4().int)[:8]}"
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT 1 FROM EMPLOYEE WHERE EMPLOYEE_ID = ?", (employee_id,))
+        if not cursor.fetchone():
+            return jsonify({"error": "Employee ID does not exist."}), 404
+
+        cursor.execute("SELECT 1 FROM CUSTOMER WHERE CUSTOMER_ID = ?", (customer_id,))
+        if not cursor.fetchone():
+            return jsonify({"error": "Customer ID does not exist."}), 404
+
+        cursor.execute("SELECT 1 FROM PROJECT WHERE PROJECT_NUM = ?", (project_num,))
+        if not cursor.fetchone():
+            return jsonify({"error": "Project Number does not exist."}), 404
+
+        cursor.execute(
+            """
+            INSERT INTO CONTRACT (CONTRACT_NUM, CONTRACT_PDF, EMPLOYEE_ID, CUSTOMER_ID)
+            VALUES (?, ?, ?, ?)
+            """,
+            (contract_num, contract_pdf, employee_id, customer_id)
+        )
+
+        cursor.execute(
+            """
+            INSERT INTO SIGNS_CONTRACT (EMPLOYEE_ID, CUSTOMER_ID, CONTRACT_NUM, PROJECT_NUM, DATE)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (employee_id, customer_id, contract_num, project_num, contract_date)
+        )
+
+        conn.commit()
+        conn.close()
+
+        return jsonify({"success": True, "message": "Contract and signing record created successfully.", "contract_num": contract_num}), 201
+
+    except sqlite3.Error as e:
+        return jsonify({"error": "Database error occurred.", "details": str(e)}), 500
+    except Exception as e:
+        return jsonify({"error": "An unexpected error occurred.", "details": str(e)}), 500
+
+
+# function for searching new contract
+@app.route('/api/contracts/search/<contract_num>', methods=['GET'])
+def Owner_search_contract(contract_num):
+    try:
+        # Connect to the database
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT C.CONTRACT_NUM, C.CONTRACT_PDF, C.EMPLOYEE_ID, C.CUSTOMER_ID, 
+                   S.PROJECT_NUM, S.DATE
+            FROM CONTRACT C
+            JOIN SIGNS_CONTRACT S ON C.CONTRACT_NUM = S.CONTRACT_NUM
+            WHERE C.CONTRACT_NUM = ?
+            """,
+            (contract_num,)
+        )
+        contract = cursor.fetchone()
+        conn.close()
+
+        if not contract:
+            return jsonify({"error": "Contract not found"}), 404
+
+        contract_data = {
+            "contract_num": contract["CONTRACT_NUM"],
+            "contract_pdf": contract["CONTRACT_PDF"],
+            "employee_id": contract["EMPLOYEE_ID"],
+            "customer_id": contract["CUSTOMER_ID"],
+            "project_num": contract["PROJECT_NUM"],
+            "date": contract["DATE"],
+        }
+
+        return jsonify(contract_data), 200
+
+    except sqlite3.Error as e:
+        return jsonify({"error": "Database error occurred.", "details": str(e)}), 500
+    except Exception as e:
+        return jsonify({"error": "An unexpected error occurred.", "details": str(e)}), 500
+
+
+# Function for editing contract
+@app.route('/api/contracts/update/<contract_num>', methods=['POST'])
+def Owner_update_contract(contract_num):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM CONTRACT WHERE CONTRACT_NUM = ?", (contract_num,))
+        contract = cursor.fetchone()
+
+        if not contract:
+            return jsonify({"error": "Contract not found"}), 404
+
+        data = request.get_json()
+        contract_text = data.get("contract_pdf", "").strip()
+
+        if not contract_text:
+            return jsonify({"error": "Contract Text is required."}), 400
+
+        cursor.execute(
+            """
+            UPDATE CONTRACT
+            SET CONTRACT_PDF = ?
+            WHERE CONTRACT_NUM = ?
+            """,
+            (contract_text, contract_num)
+        )
+        conn.commit()
+
+        return jsonify({"success": True, "message": "Contract updated successfully"}), 200
+
+    except sqlite3.Error as e:
+        return jsonify({"error": f"Database error occurred: {str(e)}"}), 500
+    finally:
+        conn.close()
+
+
+# Function to add material
+@app.route('/api/materials/create', methods=['POST'])
+def Owner_create_material():
+    try:
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        material_id = f"M{str(uuid.uuid4().int)[:8]}"
+        name = request.form.get("name", "").strip()
+        material_type = request.form.get("type", "").strip()
+        cost = request.form.get("cost", "").strip()
+        amount = request.form.get("amount", "").strip()
+        order_num = request.form.get("order_num", "").strip()
+
+        if not name or not material_type or not cost or not amount or not order_num:
+            return jsonify({"error": "All fields are required."}), 400
+        if not cost.isdigit() or not amount.isdigit():
+            return jsonify({"error": "Cost and amount must be numeric."}), 400
+
+        cursor.execute("SELECT 1 FROM ORDERS WHERE ORDER_NUM = ?", (order_num,))
+        if not cursor.fetchone():
+            return jsonify({"error": f"Order Number {order_num} does not exist."}), 404
+
+        cursor.execute(
+            """
+            INSERT INTO MATERIALS (MATERIAL_ID, NAME, TYPE, COST, AMOUNT, ORDER_NUM)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (material_id, name, material_type, int(cost), int(amount), order_num)
+        )
+        conn.commit()
+
+        return jsonify({"success": True, "message": "Material added successfully"}), 201
+
+    except sqlite3.Error as e:
+        return jsonify({"error": f"Database error occurred: {str(e)}"}), 500
+    finally:
+        conn.close()
+
+
+@app.route('/api/materials/search/<material_id>', methods=['GET'])
+def Owner_get_material_by_id(material_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT MATERIAL_ID, NAME, TYPE, COST, AMOUNT, ORDER_NUM
+            FROM MATERIALS
+            WHERE MATERIAL_ID = ?
+            """,
+            (material_id,)
+        )
+        material = cursor.fetchone()
+        conn.close()
+
+        if material:
+
+            material_data = {
+                "material_id": material["MATERIAL_ID"],
+                "name": material["NAME"],
+                "type": material["TYPE"],
+                "cost": material["COST"],
+                "amount": material["AMOUNT"],
+                "order_num": material["ORDER_NUM"],
+            }
+            return jsonify(material_data), 200
+        else:
+            return jsonify({"error": "Material not found"}), 404
+
+    except sqlite3.Error as e:
+        return jsonify({"error": f"Database error occurred: {str(e)}"}), 500
+
+
+# Funtion to assign employee to project in works_on table
+@app.route('/api/works_on/assign', methods=['POST'])
+def Owner_assign_project():
+    try:
+        employee_id = request.form.get("employee_id", "").strip()
+        project_num = request.form.get("project_num", "").strip()
+
+        if not employee_id or not project_num:
+            return jsonify({"error": "Both Employee ID and Project Number are required."}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT 1 FROM EMPLOYEE WHERE EMPLOYEE_ID = ?", (employee_id,))
+        if not cursor.fetchone():
+            return jsonify({"error": f"Employee ID {employee_id} does not exist."}), 404
+
+        cursor.execute("SELECT 1 FROM PROJECT WHERE PROJECT_NUM = ?", (project_num,))
+        if not cursor.fetchone():
+            return jsonify({"error": f"Project Number {project_num} does not exist."}), 404
+
+        cursor.execute(
+            "SELECT 1 FROM WORKS_ON WHERE EMPLOYEE_ID = ? AND PROJECT_NUM = ?",
+            (employee_id, project_num)
+        )
+        if cursor.fetchone():
+            return jsonify({"error": "This Employee is already assigned to the Project."}), 400
+
+        cursor.execute(
+            "INSERT INTO WORKS_ON (EMPLOYEE_ID, PROJECT_NUM) VALUES (?, ?)",
+            (employee_id, project_num)
+        )
+        conn.commit()
+
+        return jsonify({"success": True, "message": "Employee successfully assigned to the project."}), 201
+
+    except sqlite3.Error as e:
+        return jsonify({"error": f"Database error occurred: {str(e)}"}), 500
+    finally:
+        conn.close()
+
+# Function to delete project assignment
+@app.route('/api/works_on/delete', methods=['DELETE'])
+def Owner_delete_project_assignment():
+    data = request.get_json()
+    employee_id = data.get('employee_id')
+    project_num = data.get('project_num')
+
+    if not employee_id or not project_num:
+        return {'error': 'Employee ID and Project Number are required.'}, 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            "SELECT * FROM WORKS_ON WHERE EMPLOYEE_ID = ? AND PROJECT_NUM = ?",
+            (employee_id, project_num)
+        )
+        assignment = cursor.fetchone()
+
+        if not assignment:
+            return {'error': 'Assignment not found.'}, 404
+
+        cursor.execute(
+            "DELETE FROM WORKS_ON WHERE EMPLOYEE_ID = ? AND PROJECT_NUM = ?",
+            (employee_id, project_num)
+        )
+        conn.commit()
+        return {'success': True, 'message': 'Project assignment deleted successfully.'}, 200
+    except sqlite3.Error as e:
+        return {'error': str(e)}, 500
+    finally:
+        conn.close()
+
+#function for searching up an employees projects they are asisgned to in works_on table
+@app.route('/api/works_on/search/<employee_id>', methods=['GET'])
+def Owner_search_employee_projects(employee_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT * FROM EMPLOYEE WHERE EMPLOYEE_ID = ?", (employee_id,))
+        employee = cursor.fetchone()
+
+        if not employee:
+            return {"error": "Employee not found"}, 404
+
+        cursor.execute(
+            "SELECT PROJECT_NUM FROM WORKS_ON WHERE EMPLOYEE_ID = ?", (employee_id,)
+        )
+        projects = cursor.fetchall()
+
+        employee_projects = {
+            "employee": {
+                "id": employee["EMPLOYEE_ID"],
+                "first_name": employee["FNAME"],
+                "last_name": employee["LNAME"],
+                "phone": employee["PHONE_NUMBER"],
+                "email": employee["EMAIL"],
+            },
+            "projects": [project["PROJECT_NUM"] for project in projects],
+        }
+
+        return employee_projects, 200
+    except sqlite3.Error as e:
+        return {"error": f"Database error: {str(e)}"}, 500
+    finally:
+        conn.close()
 
 
 # Run the app
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+
+

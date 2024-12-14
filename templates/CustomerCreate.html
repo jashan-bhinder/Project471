@@ -11,7 +11,7 @@
 <div class="registration-container">
     <div class="registration-card">
         <h1 class="form-title">Registration</h1>
-        <!-- Error Messages -->
+
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         <div class="error-messages">
@@ -22,7 +22,7 @@
         {% endif %}
         {% endwith %}
         <form action="{{ url_for('customer_create') }}" method="POST" class="registration-form">
-            <!-- Personal Details -->
+
             <fieldset>
                 <legend>Personal Details</legend>
                 <div class="form-group">
@@ -50,7 +50,7 @@
                     <input type="email" id="email" name="email" placeholder="Enter your email" required>
                 </div>
             </fieldset>
-            <!-- Submit Button -->
+
             <button type="submit" class="submit-btn">Create Account</button>
         </form>
     </div>

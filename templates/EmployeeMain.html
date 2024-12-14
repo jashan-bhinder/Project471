@@ -25,7 +25,6 @@
     </nav>
 
     <div class="main-content">
-        <!-- Profile Section -->
         <section id="profile" class="dashboard-section">
             <h2 class="center-text">Welcome to your profile, {{ employee['FNAME'] }}</h2>
             <table class="profile-table">
@@ -68,7 +67,6 @@
             </div>
         </section>
 
-        <!-- Profile Settings Section -->
         <section id="profile-settings" class="dashboard-section hidden">
             <h2 class="center-text">Change Your Profile Settings</h2>
             <form class="settings-form" action="{{ url_for('update_employee') }}" method="POST">
@@ -98,7 +96,6 @@
             </form>
         </section>
 
-        <!-- Delete Account Modal -->
         <div id="delete-account-modal" class="employee_css_modal employee_css_hidden">
             <div class="employee_css_modal-content">
                 <h3>Confirm Account Deletion</h3>
@@ -110,11 +107,11 @@
             </div>
         </div>
 
-        <!-- Project Section -->
+
         <section id="project-dashboard" class="dashboard-section hidden">
             <h2 class="center-text">Assigned Employee Projects</h2>
 
-            <!-- Button Container -->
+
             <div class="employee-buttons-container">
                 <button id="employee_view-assigned-projects-button" class="employee-view-projects-button">
                     View Assigned Projects
@@ -127,19 +124,19 @@
                 </button>
             </div>
 
-            <!-- Assigned Projects Section -->
+
             <div id="employee_assigned-projects" class="hidden">
                 <h3>Assigned Projects</h3>
                 <ul id="employee_assigned-projects-list"></ul>
             </div>
 
-            <!-- All Projects Section -->
+
             <div id="employee_all-projects" class="hidden">
                 <h3>All Projects</h3>
                 <ul id="employee_all-projects-list"></ul>
             </div>
 
-            <!-- Search Modal -->
+
             <div id="project-search-modal" class="hidden modal">
                 <div class="modal-content">
                     <h3>Search for a Project</h3>
@@ -154,7 +151,7 @@
                 </div>
             </div>
 
-            <!-- Search Result Section -->
+
             <div id="employee_project-details" class="hidden">
                 <h3>Project Details</h3>
                 <table class="profile-table">
@@ -184,10 +181,10 @@
                 <button id="material-view-btn" class="material_view-btn">View Materials</button>
             </div>
             <ul id="material-list" class="material_list">
-                <!-- Dynamically populated materials list -->
+
             </ul>
 
-            <!-- Add Material Modal -->
+
             <div id="material-add-modal" class="material_modal hidden">
                 <div class="material_modal-content">
                     <span id="material-close-modal" class="material_close-btn">&times;</span>
@@ -203,7 +200,7 @@
                 </div>
             </div>
 
-            <!-- Materials List Section -->
+
             <div id="materials-list-section" class="hidden">
                 <h3>Materials for Selected Order</h3>
                 <form id="view-materials-form">
@@ -221,7 +218,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <!-- Dynamically populated materials -->
+
                     </tbody>
                 </table>
             </div>
